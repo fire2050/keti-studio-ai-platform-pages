@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课题智慧坊-AI智能平台 · 架构设计方案 Demo · v3.0</title>
+<style>
+  :root{
+    --bg:#070b16; --bg2:#0b1120; --panel:#0e1628; --panel2:#111b31;
+    --line:rgba(96,165,250,.18); --line2:rgba(139,92,246,.22);
+    --txt:#e6edf7; --sub:#8fa3c4; --dim:#5b6c8c;
+    --cyan:#22d3ee; --blue:#60a5fa; --violet:#a78bfa; --pink:#f472b6;
+    --green:#34d399; --amber:#fbbf24; --red:#f87171;
+    --glow:0 0 24px rgba(34,211,238,.12), 0 0 60px rgba(99,102,241,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:"宋体",SimSun,serif;
+    background-image:
+      linear-gradient(rgba(96,165,250,.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(96,165,250,.04) 1px,transparent 1px);
+    background-size:34px 34px;
+    line-height:1.7;
+  }
+  /* 顶部导航 */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    backdrop-filter:blur(12px);
+    background:rgba(7,11,22,.82); border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:18px;padding:0 26px;height:56px;
+  }
+  nav .logo{font-size:15px;font-weight:700;letter-spacing:1px;color:var(--cyan);
+    text-shadow:0 0 12px rgba(34,211,238,.6);white-space:nowrap}
+  nav .links{display:flex;gap:16px;overflow-x:auto;flex:1}
+  nav .links a{color:var(--sub);text-decoration:none;font-size:13px;white-space:nowrap;transition:.25s}
+  nav .links a:hover{color:var(--cyan);text-shadow:0 0 8px rgba(34,211,238,.5)}
+  nav .clock{font-size:12.5px;color:var(--violet);border:1px solid var(--line2);
+    padding:4px 10px;border-radius:6px;white-space:nowrap;
+    background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(34,211,238,.06))}
+  main{max-width:1180px;margin:0 auto;padding:86px 22px 60px}
+  /* Hero */
+  .hero{text-align:center;padding:58px 20px 44px;position:relative}
+  .hero::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse 60% 55% at 50% 0%,rgba(99,102,241,.16),transparent 70%);
+    pointer-events:none}
+  .badge{display:inline-block;font-size:12.5px;color:var(--cyan);border:1px solid var(--line);
+    padding:5px 16px;border-radius:999px;margin-bottom:20px;letter-spacing:2px;
+    background:rgba(34,211,238,.06);box-shadow:var(--glow)}
+  .hero h1{font-size:44px;font-weight:700;letter-spacing:3px;margin-bottom:14px;
+    background:linear-gradient(90deg,#22d3ee,#60a5fa,#a78bfa,#f472b6);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 18px rgba(99,102,241,.35))}
+  .hero .sub{color:var(--sub);font-size:15.5px;max-width:760px;margin:0 auto 8px}
+  .hero .ver{color:var(--dim);font-size:13px;letter-spacing:1px}
+  /* 指标条 */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:34px 0 8px}
+  .stat{border:1px solid var(--line);border-radius:12px;padding:16px 12px;text-align:center;
+    background:linear-gradient(160deg,rgba(17,27,49,.9),rgba(11,17,32,.9));transition:.3s}
+  .stat:hover{transform:translateY(-3px);box-shadow:var(--glow);border-color:var(--line2)}
+  .stat b{font-size:27px;display:block;background:linear-gradient(90deg,var(--cyan),var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-family:Georgia,serif}
+  .stat span{font-size:12.5px;color:var(--sub);letter-spacing:1px}
+  /* 章节 */
+  section{margin-top:56px}
+  .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+  .sec-head .no{font-size:13px;color:var(--cyan);border:1px solid var(--line);border-radius:8px;
+    padding:5px 12px;background:rgba(34,211,238,.06);letter-spacing:1px;white-space:nowrap}
+  .sec-head h2{font-size:24px;letter-spacing:2px}
+  .sec-head .line{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+  .card{border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:16px;
+    background:linear-gradient(165deg,rgba(17,27,49,.85),rgba(11,17,32,.85));transition:.3s}
+  .card:hover{border-color:var(--line2);box-shadow:var(--glow)}
+  .card h3{font-size:17px;color:var(--cyan);margin-bottom:12px;letter-spacing:1px;
+    display:flex;align-items:center;gap:8px}
+  .card h3::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan)}
+  .card p,.card li{color:var(--sub);font-size:14px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+  /* 架构图 */
+  .arch{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .layer{display:flex;align-items:center;padding:13px 18px;border-bottom:1px dashed var(--line);gap:14px}
+  .layer:last-child{border-bottom:none}
+  .layer .tag{width:118px;flex-shrink:0;font-size:12.5px;letter-spacing:1px;color:var(--bg);
+    font-weight:700;text-align:center;border-radius:6px;padding:7px 4px}
+  .layer .items{display:flex;flex-wrap:wrap;gap:8px}
+  .layer .items span{font-size:12.5px;color:var(--txt);border:1px solid var(--line);
+    padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.03)}
+  .layer .items span.hl{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 10px rgba(34,211,238,.15)}
+  .t1{background:linear-gradient(90deg,#22d3ee,#38bdf8)}
+  .t2{background:linear-gradient(90deg,#60a5fa,#818cf8)}
+  .t3{background:linear-gradient(90deg,#a78bfa,#c084fc)}
+  .t4{background:linear-gradient(90deg,#f472b6,#fb7185)}
+  .t5{background:linear-gradient(90deg,#34d399,#2dd4bf)}
+  .t6{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+  /* 表格 */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;color:var(--sub)}
+  th{background:rgba(96,165,250,.08);color:var(--txt);font-weight:700;letter-spacing:1px;white-space:nowrap}
+  td{background:rgba(255,255,255,.015)}
+  tr:hover td{background:rgba(34,211,238,.05)}
+  .ok{color:var(--green)} .warn{color:var(--amber)} .no{color:var(--red)}
+  /* Agent卡片 */
+  .agent{border:1px solid var(--line);border-radius:12px;padding:16px;background:rgba(11,17,32,.7);transition:.3s}
+  .agent:hover{transform:translateY(-3px);border-color:var(--line2);box-shadow:var(--glow)}
+  .agent .name{font-size:15.5px;color:var(--violet);font-weight:700;margin-bottom:6px;letter-spacing:1px}
+  .agent .role{font-size:12.5px;color:var(--sub);margin-bottom:8px;min-height:40px}
+  .agent .tools{display:flex;flex-wrap:wrap;gap:5px}
+  .agent .tools i{font-style:normal;font-size:11px;color:var(--cyan);border:1px solid var(--line);
+    padding:2px 8px;border-radius:4px}
+  /* 时间线 */
+  .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:900px){.timeline{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.timeline{grid-template-columns:1fr}}
+  .phase{border:1px solid var(--line);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+  .phase::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--c1),var(--c2))}
+  .phase .p{font-size:11px;letter-spacing:1px;color:var(--dim);margin-bottom:4px}
+  .phase .t{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--txt)}
+  .phase ul{list-style:none}
+  .phase li{font-size:12.5px;color:var(--sub);padding-left:14px;position:relative;margin-bottom:5px}
+  .phase li::before{content:"▸";position:absolute;left:0;color:var(--c2)}
+  .phase .acc{font-size:11.5px;color:var(--c2);border:1px solid var(--line);border-radius:6px;
+    padding:4px 8px;margin-top:8px;display:inline-block}
+  /* 脚注 */
+  footer{margin-top:64px;border-top:1px solid var(--line);padding-top:20px;text-align:center;
+    color:var(--dim);font-size:12.5px}
+  footer .v{color:var(--cyan);letter-spacing:2px}
+  .note{font-size:12px;color:var(--dim);margin-top:8px}
+  .pill{display:inline-block;font-size:11.5px;padding:3px 10px;border-radius:999px;margin:2px;
+    border:1px solid var(--line);color:var(--sub)}
+  .pill.cyan{color:var(--cyan);border-color:rgba(34,211,238,.35)}
+  .pill.vio{color:var(--violet);border-color:rgba(139,92,246,.35)}
+  .pill.grn{color:var(--green);border-color:rgba(52,211,153,.35)}
+  .pill.amb{color:var(--amber);border-color:rgba(251,191,36,.35)}
+  .scroll-top{position:fixed;right:22px;bottom:22px;width:40px;height:40px;border-radius:10px;
+    border:1px solid var(--line2);background:rgba(17,27,49,.9);color:var(--cyan);font-size:18px;
+    cursor:pointer;display:none;z-index:99;transition:.3s}
+  .scroll-top:hover{box-shadow:var(--glow)}
+  /* 视图切换菜单（方案总览 ↔ 动态演示版·即将上线） */
+  .view-switch{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-shrink:0}
+  .view-switch .menu-switch{display:block;padding:6px 14px;font-size:12.5px;color:var(--sub);
+    text-decoration:none;letter-spacing:.5px;transition:.25s;cursor:pointer}
+  .view-switch .menu-switch:hover{color:var(--cyan)}
+  .view-switch .menu-switch.on{background:linear-gradient(135deg,rgba(34,211,238,.16),rgba(139,92,246,.16));
+    color:var(--cyan);box-shadow:inset 0 0 0 1px var(--line2)}
+  /* 动态演示版·即将上线：点击顶部菜单跳转至独立子页面（非内嵌） */
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">◈ 架构方案 DEMO</div>
+  <div class="links">
+    <a href="#arch">总体架构</a><a href="#agent">Agent平台</a><a href="#model">模型训练</a>
+    <a href="#stack">技术栈</a><a href="#mcp">MCP输出</a><a href="#ukp">统一知识</a><a href="#perm">权限矩阵</a>
+    <a href="#road">分期路线</a><a href="#ops">治理成本</a><a href="#sec">安全设计</a>
+  </div>
+  <div class="view-switch">
+    <a href="#" id="btnPlan" class="menu-switch on">方案总览</a>
+    <a href="#" id="btnFront" class="menu-switch">动态演示版·即将上线</a>
+  </div>
+  <div class="clock" id="clock">--:--:--</div>
+</nav>
+
+<main>
+
+  <div id="view-plan">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">全栈开源 · AI原生 · 双协议标准</div>
+    <h1>课题智慧坊 · AI智能平台</h1>
+    <p class="sub">面向课题研究与材料撰写的 AI 生产力平台：四类用户角色 × 三端工作台，覆盖统一知识平台、Agent 智能编排、模型训练微调、MCP 能力输出与轻量化分期建设。</p>
+    <p class="ver">v3.0 · 2026-09-15 · 编制：资深系统架构师</p>
+    <div class="stats">
+      <div class="stat"><b>4</b><span>类用户角色</span></div>
+      <div class="stat"><b>3</b><span>端工作台</span></div>
+      <div class="stat"><b>5</b><span>业务Agent</span></div>
+      <div class="stat"><b>5</b><span>MCP Server</span></div>
+      <div class="stat"><b>4</b><span>知识源统一接入</span></div>
+      <div class="stat"><b>0</b><span>商业授权依赖</span></div>
+    </div>
+  </div>
+
+  <!-- 总体架构 -->
+  <section id="arch">
+    <div class="sec-head"><span class="no">01</span><h2>系统总体架构</h2><div class="line"></div></div>
+    <div class="card">
+      <p>AI原生五层架构 + 两大纵向体系：<b style="color:var(--violet)">智能体平台体系</b>（Agent运行时→业务Agent群→MCP工具服务器，横向贯穿业务层）与<b style="color:var(--cyan)">模型训练体系</b>（数据构建→微调→评测→注册→部署，纵向独立于在线服务）。</p>
+    </div>
+    <div class="arch">
+      <div class="layer"><span class="tag t1">用户接入层</span><div class="items"><span>Web门户</span><span>管理后台</span><span>专家工作台</span><span>移动端H5</span></div></div>
+      <div class="layer"><span class="tag t2">API网关层</span><div class="items"><span class="hl">APISIX</span><span>鉴权</span><span>限流</span><span>路由</span><span>按key配额</span><span>用量仪表盘</span></div></div>
+      <div class="layer"><span class="tag t3">业务应用层</span><div class="items"><span>科研项目管理</span><span>企业申报服务</span><span>知识产权管理</span><span>成果转化平台</span><span>知识管理智库</span><span>客户CRM</span><span>文档协同生成</span><span>政策追踪</span></div></div>
+      <div class="layer"><span class="tag t4">Agent平台体系</span><div class="items"><span class="hl">Spring AI 2.0</span><span class="hl">LangGraph</span><span class="hl">Dify</span><span>科研Agent</span><span>申报Agent</span><span>知产Agent</span><span>政策Agent</span><span>文档Agent</span><span class="hl">MCP/A2A</span></div></div>
+      <div class="layer"><span class="tag t5">模型训练体系</span><div class="items"><span class="hl">LLaMA-Factory</span><span>MLflow</span><span>RAGAs</span><span>DVC</span><span class="hl">vLLM</span><span>Qwen3.5</span><span>DeepSeek V4 Flash</span><span>bge-m3</span></div></div>
+      <div class="layer"><span class="tag t5">数据与中间件</span><div class="items"><span>PostgreSQL 16</span><span>Redis 7</span><span>OpenSearch 2</span><span>MinIO</span><span>Milvus 2.4</span><span>RabbitMQ</span><span>Nacos</span><span>Ollama(开发)</span></div></div>
+      <div class="layer"><span class="tag t6">基础设施运维</span><div class="items"><span>Docker / Compose</span><span>K8s(成长期)</span><span>GitLab CE</span><span>Prometheus+Grafana</span><span>ELK</span><span>SkyWalking</span></div></div>
+    </div>
+  </section>
+
+
+  <!-- 用户体系（v3.0） -->
+  <section id="role">
+    <div class="sec-head"><span class="no">02</span><h2>用户体系 · 四角色 × 三端</h2><div class="line"></div></div>
+    <div class="card">
+      <p><b style="color:var(--violet)">系统全称：课题智慧坊-AI智能平台</b>。平台按四类主体组织权限：管理员（平台方）、课题专家（签约专家）、高级用户（付费）、基础用户（免费）。四端形态：<b>用户门户</b>（基础 / 高级用户）、<b>专家工作台</b>（课题专家）、<b>运营后台</b>（管理员）、<b>MCP 能力层</b>（对外输出）。技术底座完全共用，差异只落在<b>权限点、额度、数据可见域</b>三处。</p>
+      <p class="note">三层判定顺序：RBAC（能不能用）→ ABAC 数据域（能看多少）→ 额度闸门（能用多少）。全部表驱动（role_def / permission / quota_ledger），禁止在业务代码里按角色写 if-else。</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>四角色定义</h3>
+        <table>
+          <tr><th>角色</th><th>定位</th><th>付费方式</th><th>关键约束</th></tr>
+          <tr><td><b>管理员 ADMIN</b></td><td>平台配置 / 审核 / 风控，不产出稿件</td><td>平台自用</td><td>查私有稿须双人 + 登记 + 留痕</td></tr>
+          <tr><td><b>课题专家 EXPERT</b></td><td>为高级用户提供课题咨询（代笔）服务</td><td>平台付劳务</td><td>只接平台派 / 抢单，不直接对客</td></tr>
+          <tr><td><b>高级用户 PREMIUM</b></td><td>通用权益 + 专家专属服务 + 高级 AI</td><td>订阅 + 服务包</td><td>额度耗尽降级不硬拦</td></tr>
+          <tr><td><b>基础用户 BASIC</b></td><td>基础信息 / 政策资讯 / 基础 AI</td><td>免费</td><td>限可见域与月度额度</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>专家服务闭环（十二步）</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--sub);margin-bottom:8px">
+          <span class="pill cyan">① 需求单</span><span class="pill cyan">② AI 分诊</span><span class="pill vio">③ 派 / 抢单</span>
+          <span class="pill vio">④ 隔离空间</span><span class="pill amb">⑤ 大纲确认</span><span class="pill amb">⑥ AI 初稿</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--sub);margin-bottom:10px">
+          <span class="pill vio">⑦ 专家加工</span><span class="pill grn">⑧ AI 审核</span><span class="pill grn">⑨ 内部质控</span>
+          <span class="pill grn">⑩ 交付验收</span><span class="pill cyan">⑪ 脱敏沉淀</span><span class="pill cyan">⑫ 结算留痕</span>
+        </div>
+        <p class="note">SLA：响应 ≤4h · 万字交付 ≤3 工作日 · 返修 ≤2 轮。合规底线：交付说明标注 AI 辅助程度与人工负责边界，<b>不得承诺「包过 / 包录用」</b>；真实客户稿件与个人材料在任何情况下都不进入训练语料。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>基础 AI vs 高级 AI · 十维分级</h3>
+      <table>
+        <tr><th>维度</th><th>基础 AI（基础用户）</th><th>高级 AI（高级用户 / 专家 / 管理员）</th></tr>
+        <tr><td>模型档位</td><td>9B 小档位 + 缓存优先</td><td>27B+ 大档位 / 商用 API 智能路由</td></tr>
+        <tr><td>上下文窗口</td><td>8K tokens</td><td>128K tokens（长文档整篇直入）</td></tr>
+        <tr><td>长文档解析</td><td>不支持（&gt;20 页需拆分）</td><td>PDF / Word 整篇 + 大文档分级加载</td></tr>
+        <tr><td>AI 审核</td><td>仅错别字 / 标点</td><td>七项全量（敏感词三级 / 口语化 / 去 AI 化…）</td></tr>
+        <tr><td>深度研究 Agent</td><td>不可用</td><td>多轮检索 + 交叉验证 + 引用溯源</td></tr>
+        <tr><td>私有知识空间</td><td>不可用</td><td>可建 10 个私有库</td></tr>
+        <tr><td>MCP 对外输出</td><td>不可用</td><td>授权后供第三方 Agent 调用</td></tr>
+        <tr><td>算力队列</td><td>共享队列（高峰排队）</td><td>优先队列（旺季不降级）</td></tr>
+        <tr><td>月度额度</td><td>问答 100 次 / 写作 20 篇</td><td>问答 3,000 次 / 写作 200 篇</td></tr>
+        <tr><td>服务等级</td><td>社区互助 · 工作日 24h</td><td>4h 响应 · SLA 99% · 专属服务群</td></tr>
+      </table>
+      <p class="note">额度耗尽 = 降级到小档位模型，<b>不硬拦</b>；升级后即时恢复。</p>
+    </div>
+    <div class="card">
+      <h3>数据库规划：本地为主 · Supabase 跑通 demo</h3>
+      <table>
+        <tr><th>项</th><th>选型</th><th>说明</th></tr>
+        <tr><td>生产主库</td><td><b>本地 PostgreSQL 16</b></td><td>五维论证：数据出境合规、客户合同约束、资产主权、检索延迟、长期成本</td></tr>
+        <tr><td>演进路线</td><td>容器起步 → 主从 + PITR → 读写分离</td><td>目标 RPO ≤15min、RTO ≤1h</td></tr>
+        <tr><td>demo 形态</td><td>Supabase</td><td>RLS 必开；service_role 不下发前端；Storage 私有 + 签名 URL</td></tr>
+        <tr><td>切换策略</td><td>迁移脚本为唯一真源 + 数据源适配层</td><td>含 12 项切换验收清单（向量召回重合率 ≥95%、7 天回滚窗口）</td></tr>
+        <tr><td>禁止事项</td><td>SQLite 仅作本地 Worker 队列</td><td>不得作为主库使用</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- Agent平台 -->
+  <section id="agent">
+    <div class="sec-head"><span class="no">03</span><h2>智能体 Agent 平台</h2><div class="line"></div></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>协议底座（2026标准格局）</h3>
+        <p><b style="color:var(--cyan)">MCP</b>：Agent↔工具/数据垂直集成，无状态HTTP架构，月下载1.1亿+；<b style="color:var(--violet)">A2A</b>：Agent↔Agent水平协作，v1.0规范，150+组织生产部署。两大协议2026-08同归AAIF统一治理，选型风险消除。</p>
+        <p style="margin-top:8px"><span class="pill cyan">MCP 管工具</span><span class="pill vio">A2A 管协作</span><span class="pill grn">能力即资产</span><span class="pill amb">不建上帝Agent</span></p>
+      </div>
+      <div class="card">
+        <h3>运行时选型</h3>
+        <p><b style="color:var(--cyan)">Spring AI 2.0</b>（Java主栈，与Spring Boot无缝集成）｜ <b style="color:var(--violet)">LangGraph 1.2</b>（Python复杂有状态工作流，断点恢复）｜ <b style="color:var(--pink)">Dify</b>（低代码运营）。AutoGen已进入维护模式，明确不采用。</p>
+      </div>
+    </div>
+    <div class="grid3">
+      <div class="agent"><div class="name">科研Agent</div><div class="role">课题选题推荐、进度管理、结题材料准备</div><div class="tools"><i>PM MCP</i><i>RAG MCP</i></div></div>
+      <div class="agent"><div class="name">申报Agent</div><div class="role">资质诊断评估、匹配度打分、申报排期</div><div class="tools"><i>CRM MCP</i><i>POLICY MCP</i><i>RAG MCP</i></div></div>
+      <div class="agent"><div class="name">知产Agent</div><div class="role">商标近似检索、侵权风险评估、年费提醒</div><div class="tools"><i>RAG MCP</i><i>PM MCP</i></div></div>
+      <div class="agent"><div class="name">政策Agent</div><div class="role">政策爬取解析、企业画像匹配、订阅推送</div><div class="tools"><i>POLICY MCP</i><i>CRM MCP</i></div></div>
+      <div class="agent"><div class="name">文档Agent</div><div class="role">申请书/申报书模板化生成、润色查重</div><div class="tools"><i>DOC MCP</i><i>RAG MCP</i></div></div>
+      <div class="card" style="margin:0">
+        <h3>治理机制</h3>
+        <p style="font-size:12.5px">A2A容错：Resilience4j超时/熔断/降级/重试；上下文传递规范（委派≤500/查询≤100/协作≤1,000 tokens）；能力卡片 GET /capabilities 自动发现；MCP工具版本管理与Pact契约测试。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 模型训练 -->
+  <section id="model">
+    <div class="sec-head"><span class="no">04</span><h2>模型训练与微调体系</h2><div class="line"></div></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>三层能力金字塔</h3>
+        <p><b style="color:var(--green)">L1 零训练</b>：基座+Prompt+AgenticRAG，覆盖80%通用场景</p>
+        <p><b style="color:var(--cyan)">L2 轻训练</b>：LoRA/QLoRA微调，专业场景准确率提升</p>
+        <p><b style="color:var(--violet)">L3 持续闭环</b>：业务数据回流+周期性再训练，构建壁垒</p>
+        <p class="note">先RAG后微调——RAG解决时效与溯源，微调解决文风/格式/领域推理，两者结合而非互斥。</p>
+      </div>
+      <div class="card">
+        <h3>SFT 数据 P0/P1 分级</h3>
+        <table>
+          <tr><th>级别</th><th>场景</th><th>构建方式</th><th>目标</th><th>质量</th></tr>
+          <tr><td><b style="color:var(--violet)">P0</b></td><td>完整申请书写作、政策匹配推理</td><td>专家纯手工精标</td><td>2,000对</td><td>互审100%</td></tr>
+          <tr><td><b style="color:var(--cyan)">P1</b></td><td>润色/格式/摘要辅助场景</td><td>Agent初稿+修订差分</td><td>8,000对</td><td>抽检≥90%</td></tr>
+        </table>
+        <p class="note">微调触发条件：P0≥1,500对 且 RAG评测集≥500条 且 专家确认核心场景覆盖完整。人力：P0需2名专家全职6-7个月，建议阶段1提前启动。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>训练流水线与基座模型</h3>
+      <p style="font-size:12.5px;margin-bottom:10px">
+        <span class="pill cyan">LLaMA-Factory</span><span class="pill vio">MLflow实验跟踪</span><span class="pill grn">RAGAs评测门禁</span>
+        <span class="pill amb">模型注册model_registry</span><span class="pill cyan">vLLM灰度发布</span><span class="pill grn">一键回滚&lt;10min</span>
+      </p>
+      <table>
+        <tr><th>用途</th><th>模型</th><th>规格</th><th>协议</th></tr>
+        <tr><td>主力推理（生产）</td><td>Qwen3.5</td><td>9B / 27B / 122B（多模态+工具调用+思考）</td><td>Apache 2.0</td></tr>
+        <tr><td>高性价比长文档</td><td>DeepSeek V4 Flash</td><td>284B MoE（激活13B），1M上下文</td><td>MIT</td></tr>
+        <tr><td>Embedding</td><td>bge-m3</td><td>稠密+稀疏双输出，混合检索</td><td>MIT</td></tr>
+        <tr><td>Reranker</td><td>bge-reranker-v2-m3</td><td>重排序</td><td>Apache 2.0</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 技术栈 -->
+  <section id="stack">
+    <div class="sec-head"><span class="no">05</span><h2>开源技术栈选型</h2><div class="line"></div></div>
+    <div class="grid3">
+      <div class="card"><h3>前端</h3><p>Vue 3 + Vite + Element Plus + Pinia + ECharts + Vant(H5)</p></div>
+      <div class="card"><h3>后端</h3><p>Spring Boot 3 + Spring Cloud + MyBatis-Plus + Spring Security + Flowable 7</p></div>
+      <div class="card"><h3>Agent</h3><p>Spring AI 2.0 + LangGraph 1.2 + Dify + MCP/A2A 双协议</p></div>
+      <div class="card"><h3>模型推理</h3><p>vLLM(生产) + Ollama(开发) + Qwen3.5 + DeepSeek V4 Flash</p></div>
+      <div class="card"><h3>数据层</h3><p>本地 PostgreSQL 16（主库）+ Redis 7 + OpenSearch 2 + MinIO + Milvus 2.4；demo 阶段用 Supabase 跑通流程（RLS 必开）</p></div>
+      <div class="card"><h3>文档与运维</h3><p>OnlyOffice CE + Apache POI + Docker/K8s + GitLab CE + Prometheus/Grafana</p></div>
+    </div>
+    <div class="card">
+      <h3>关键合规决策</h3>
+      <p style="font-size:13px"><b style="color:var(--green)">OpenSearch</b> 替代 Elasticsearch 规避 SSPL 协议风险 ｜ <b style="color:var(--green)">Qwen3.5/DeepSeek</b> 宽松许可可商用可微调 ｜ <b style="color:var(--amber)">MinIO / OnlyOffice CE</b>（AGPL）不修改源码则自用合规 ｜ <b style="color:var(--amber)">Dify</b> 多租户对外SaaS需注意。</p>
+    </div>
+  </section>
+
+  <!-- MCP输出 -->
+  <section id="mcp">
+    <div class="sec-head"><span class="no">06</span><h2>知识库与文档撰写 · MCP 输出</h2><div class="line"></div></div>
+    <!-- 知识库与文档撰写 MCP 对接架构图 -->
+    <div class="card" style="padding:18px">
+      <h3>知识库与文档撰写 MCP 对接架构图（v2.5）</h3>
+      <p class="note" style="margin-bottom:12px">能力跟随用户客户端：顾问在千问办公 / WorkBuddy 对话中直接调用公司知识库与文档撰写能力，无需登录新系统；rag-server 阶段0末上线（只读先行），doc-server 阶段1末上线（读写·守门）。</p>
+      <svg viewBox="0 0 680 320" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg" font-family="'宋体',SimSun,serif">
+        <defs>
+          <linearGradient id="mcpGc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+          <linearGradient id="mcpGg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#818cf8"/></linearGradient>
+          <linearGradient id="mcpGv" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#c084fc"/></linearGradient>
+          <linearGradient id="mcpGg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#2dd4bf"/></linearGradient>
+          <marker id="mcpArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#5b6c8c"/>
+          </marker>
+        </defs>
+        <rect x="0" y="0" width="680" height="320" rx="12" fill="#0b1120" stroke="rgba(96,165,250,.2)"/>
+        <!-- 列标题 -->
+        <text x="79" y="26" text-anchor="middle" fill="#8fa3c4" font-size="10.5" letter-spacing="1">外部 Agent 客户端</text>
+        <text x="284" y="26" text-anchor="middle" fill="#8fa3c4" font-size="10.5" letter-spacing="1">接入网关（固定域名）</text>
+        <text x="479" y="26" text-anchor="middle" fill="#8fa3c4" font-size="10.5" letter-spacing="1">MCP 工具服务器</text>
+        <!-- 客户端 -->
+        <rect x="12" y="40" width="135" height="34" rx="7" fill="#0e1628" stroke="rgba(34,211,238,.35)"/>
+        <text x="79" y="61" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="bold">千问办公</text>
+        <rect x="12" y="82" width="135" height="34" rx="7" fill="#0e1628" stroke="rgba(34,211,238,.35)"/>
+        <text x="79" y="103" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="bold">WorkBuddy</text>
+        <rect x="12" y="124" width="135" height="34" rx="7" fill="#0e1628" stroke="rgba(34,211,238,.35)"/>
+        <text x="79" y="145" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="bold">自建 Agent</text>
+        <!-- 网关 -->
+        <rect x="210" y="66" width="148" height="76" rx="9" fill="#0e1628" stroke="rgba(96,165,250,.5)"/>
+        <rect x="210" y="66" width="148" height="3" fill="url(#mcpGg)"/>
+        <text x="284" y="88" text-anchor="middle" fill="#60a5fa" font-size="12" font-weight="bold">APISIX / Nginx</text>
+        <text x="284" y="106" text-anchor="middle" fill="#8fa3c4" font-size="9.5">固定域名 + HTTPS 反代</text>
+        <text x="284" y="121" text-anchor="middle" fill="#8fa3c4" font-size="9.5">独立 Key 配额（60次/分）</text>
+        <text x="284" y="136" text-anchor="middle" fill="#8fa3c4" font-size="9.5">用量仪表盘 / 审计日志</text>
+        <!-- servers -->
+        <rect x="404" y="40" width="150" height="58" rx="8" fill="#0e1628" stroke="rgba(167,139,250,.5)"/>
+        <rect x="404" y="40" width="150" height="3" fill="url(#mcpGv)"/>
+        <text x="479" y="61" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="bold">rag-server（只读）</text>
+        <text x="479" y="77" text-anchor="middle" fill="#8fa3c4" font-size="8.5">search_knowledge · retrieve_policy · search_template</text>
+        <text x="479" y="91" text-anchor="middle" fill="#5b6c8c" font-size="8.5">domain 分域过滤 · 强制来源引用</text>
+        <rect x="404" y="106" width="150" height="58" rx="8" fill="#0e1628" stroke="rgba(244,114,182,.5)"/>
+        <rect x="404" y="106" width="150" height="3" fill="#f472b6"/>
+        <text x="479" y="127" text-anchor="middle" fill="#f472b6" font-size="11" font-weight="bold">doc-server（读写）</text>
+        <text x="479" y="143" text-anchor="middle" fill="#8fa3c4" font-size="8.5">get_session_token · generate_document · optimize_text</text>
+        <text x="479" y="157" text-anchor="middle" fill="#5b6c8c" font-size="8.5">session_token 守门 · AI初稿水印</text>
+        <!-- 共享底座 -->
+        <rect x="12" y="248" width="656" height="52" rx="9" fill="#0e1628" stroke="rgba(52,211,153,.5)"/>
+        <rect x="12" y="248" width="656" height="3" fill="url(#mcpGg2)"/>
+        <text x="340" y="270" text-anchor="middle" fill="#34d399" font-size="12" font-weight="bold" letter-spacing="1">共享 RAG 底座（一套知识库 · 一套检索逻辑）</text>
+        <text x="340" y="289" text-anchor="middle" fill="#8fa3c4" font-size="9.5">pgvector + bge-m3 混合检索 ｜ MinIO 文档存储 ｜ vLLM 推理（Qwen3.5 / DeepSeek V4 Flash）</text>
+        <!-- 箭头：客户端→网关 -->
+        <line x1="147" y1="57" x2="207" y2="72" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <line x1="147" y1="99" x2="207" y2="99" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <line x1="147" y1="141" x2="207" y2="126" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <!-- 箭头：网关→servers -->
+        <line x1="358" y1="85" x2="402" y2="76" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <line x1="358" y1="111" x2="402" y2="126" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <!-- 箭头：servers→底座 -->
+        <line x1="479" y1="164" x2="479" y2="245" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <!-- 防双轨漂移门禁 -->
+        <rect x="404" y="172" width="264" height="44" rx="7" fill="rgba(251,191,36,.05)" stroke="rgba(251,191,36,.25)"/>
+        <text x="536" y="190" text-anchor="middle" fill="#fbbf24" font-size="9.5" font-weight="bold">防双轨漂移门禁</text>
+        <text x="536" y="205" text-anchor="middle" fill="#8fa3c4" font-size="8.5">共享检索核心 · A/B对比50题差异率&lt;5%</text>
+        <!-- 底部安全注记 -->
+        <text x="340" y="314" text-anchor="middle" fill="#5b6c8c" font-size="9">每客户端独立 Key+配额 ｜ 生产禁用临时隧道 ｜ 客户档案与案例永不出内网</text>
+      </svg>
+    </div>
+    <div class="card">
+      <h3>对接架构：能力跟随用户客户端</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:12.5px;margin-bottom:14px">
+        <span class="pill cyan">千问办公</span><span class="pill vio">WorkBuddy</span><span class="pill grn">自建Agent</span>
+        <span style="color:var(--dim)">→</span>
+        <span class="pill amb">APISIX / Nginx (固定域名HTTPS)</span>
+        <span style="color:var(--dim)">→</span>
+        <span class="pill cyan">rag-server（只读）</span><span class="pill vio">doc-server（读写·session_token守门）</span>
+        <span style="color:var(--dim)">→</span>
+        <span class="pill grn">共享RAG底座：pgvector + bge-m3 + MinIO + vLLM</span>
+      </div>
+      <table>
+        <tr><th>Server</th><th>核心工具</th><th>安全策略</th></tr>
+        <tr><td><b style="color:var(--cyan)">rag-server</b>（阶段0末上线）</td><td>search_knowledge / retrieve_policy / search_template</td><td>domain分域权限强制过滤 + 脱敏层 + 强制来源引用</td></tr>
+        <tr><td><b style="color:var(--violet)">doc-server</b>（阶段1末上线）</td><td>get_session_token / generate_document / optimize_text / check_similarity</td><td>两段式鉴权 + "AI初稿"水印 + 审计日志</td></tr>
+      </table>
+      <p class="note">每客户端独立API key+独立配额（60次/分基线）；生产固定域名+HTTPS反代，临时隧道仅限联调；共享检索核心实现，A/B对比差异率&lt;5%门禁防双轨漂移。</p>
+    </div>
+  </section>
+
+  <!-- 统一知识平台（v2.6） -->
+  <section id="ukp">
+    <div class="sec-head"><span class="no">07</span><h2>统一知识平台 · 多源知识联邦</h2><div class="line"></div></div>
+    <div class="card">
+      <h3>为什么需要统一知识平台</h3>
+      <p>企业知识天然分散在四类平台：自建AI知识库（政策 / 模板 / 成果等核心资产）、ima 知识库（个人与团队资料沉淀、文章素材）、钉钉文档（内部协同与制度流程）、腾讯文档（对客交付物与跨组织协同）。顾问回答一个问题需跨平台翻找，而 AI 只覆盖其中一部分——<b style="color:var(--amber)">知识资产越多，查找成本越高</b>。</p>
+      <table>
+        <tr><th>原则</th><th>含义</th><th>反模式（禁止）</th></tr>
+        <tr><td><b style="color:var(--cyan)">① 不搬迁，只连接</b></td><td>各平台保留为员工原有的使用与协作现场，平台只做连接与索引</td><td>强制全员把文档搬到自建库——协作现场丢失、推行阻力极大</td></tr>
+        <tr><td><b style="color:var(--cyan)">② 统一入口，单一答案</b></td><td>上层只面对一个检索接口，多源结果融合去重后统一呈现</td><td>四个平台四个答案，顾问需自行判断信哪个</td></tr>
+        <tr><td><b style="color:var(--cyan)">③ 产出即沉淀</b></td><td>文档 / 文章定稿后自动回流为可检索知识，形成正循环</td><td>写完即弃，同类问题反复从零撰写</td></tr>
+      </table>
+      <p class="note">主次定位：自建AI知识库为<b>主库（Source of Truth）与索引中枢</b>——负责统一索引、融合排序、权限收敛与对外 MCP 输出；ima / 钉钉 / 腾讯文档为<b>协作现场与增量来源</b>。任一外部平台不可用时，核心知识资产与检索能力不受影响。</p>
+    </div>
+    <div class="card">
+      <h3>四类知识源能力矩阵（2026-09 实测口径）</h3>
+      <table>
+        <tr><th>知识源</th><th>业务定位</th><th>检索能力</th><th>写入能力</th><th>权限粒度</th><th>关键约束</th></tr>
+        <tr><td><b style="color:var(--green)">① 自建AI知识库</b><br><span style="color:var(--dim);font-size:11px">Dify + pgvector/Milvus + MinIO</span></td><td>主库：政策库 / 模板库 / 成果库 / 方法论</td><td>向量+全文混合检索、bge-reranker 重排，完全可控</td><td>完全可控，支持结构化字段与质量分</td><td>角色×分域矩阵，检索前置过滤</td><td>需自建运维；冷启动需录入人力</td></tr>
+        <tr><td><b style="color:var(--cyan)">② ima 知识库</b></td><td>个人与团队资料沉淀、文章素材、网页剪藏</td><td>search_knowledge / search_knowledge_base API</td><td>add_knowledge（文件/网页入库）、import_urls 批量</td><td>知识库级</td><td>单文件上限：TXT/MD/Excel 10MB、图片30MB、PDF/Word/PPT 200MB</td></tr>
+        <tr><td><b style="color:var(--violet)">③ 钉钉文档知识库</b></td><td>企业内部协同文档、制度与流程知识</td><td>知识库节点树遍历；<b style="color:var(--amber)">无原生语义检索</b>，需由统一平台补齐</td><td>创建文档、目录管理、权限成员管理</td><td>知识库级 / 文件夹级 / 单文档级三层继承</td><td>文档导出（markdown）为定向开放能力，需申请开通</td></tr>
+        <tr><td><b style="color:var(--amber)">④ 腾讯文档</b></td><td>对客交付物、跨组织协同、表格类数据</td><td>关键字搜索 <span style="color:var(--dim)">GET /openapi/drive/v2/search</span></td><td>新建 / 导入 / 导出 / 编辑 / 权限 / 协作成员全能力</td><td>文档级 + 协作成员；新文档默认私有</td><td>API 免费额度按应用计数，需监控；同名文件可重复，需显式去重</td></tr>
+      </table>
+      <p class="note">能力结论：四类源中自建库完全可控；ima 与腾讯文档具备<b>原生读写 + 检索</b>；钉钉文档具备<b>结构化遍历 + 读取</b>，语义检索必须由统一平台补齐。因此统一平台必须同时支持「镜像入库」与「检索代理」两种形态。</p>
+    </div>
+    <!-- 统一知识平台架构图 -->
+    <div class="card" style="padding:18px">
+      <h3>统一知识平台架构图（v2.6）</h3>
+      <p class="note" style="margin-bottom:12px">自上而下六层：应用 → 融合 → 索引 → 接入（适配器隔离第三方差异）→ 同步 → 沉淀。上层只见一个检索接口，底层差异全部由适配器吸收。</p>
+      <svg viewBox="0 0 680 472" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg" font-family="'宋体',SimSun,serif">
+        <defs>
+          <linearGradient id="ukGc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+          <linearGradient id="ukGv" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#c084fc"/></linearGradient>
+          <linearGradient id="ukGg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#2dd4bf"/></linearGradient>
+          <linearGradient id="ukGa" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#f59e0b"/></linearGradient>
+          <linearGradient id="ukGp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f472b6"/><stop offset="1" stop-color="#fb7185"/></linearGradient>
+          <marker id="ukArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#5b6c8c"/></marker>
+        </defs>
+        <rect x="0" y="0" width="680" height="472" rx="12" fill="#0b1120" stroke="rgba(96,165,250,.2)"/>
+        <!-- 应用层 -->
+        <rect x="12" y="30" width="656" height="46" rx="9" fill="#0e1628" stroke="rgba(34,211,238,.35)"/>
+        <text x="26" y="58" fill="#22d3ee" font-size="11" font-weight="bold">应用层</text>
+        <rect x="88" y="39" width="180" height="28" rx="6" fill="#0e1628" stroke="rgba(34,211,238,.4)"/>
+        <text x="178" y="57" text-anchor="middle" fill="#22d3ee" font-size="10.5">问答 Agent（跨源编排）</text>
+        <rect x="278" y="39" width="150" height="28" rx="6" fill="#0e1628" stroke="rgba(34,211,238,.4)"/>
+        <text x="353" y="57" text-anchor="middle" fill="#22d3ee" font-size="10.5">文档撰写 Agent</text>
+        <rect x="438" y="39" width="152" height="28" rx="6" fill="#0e1628" stroke="rgba(34,211,238,.4)"/>
+        <text x="514" y="57" text-anchor="middle" fill="#22d3ee" font-size="10.5">MCP 对外输出</text>
+        <rect x="600" y="39" width="56" height="28" rx="6" fill="#0e1628" stroke="rgba(34,211,238,.4)"/>
+        <text x="628" y="57" text-anchor="middle" fill="#22d3ee" font-size="10.5">前端</text>
+        <line x1="340" y1="76" x2="340" y2="92" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 融合层 -->
+        <rect x="12" y="94" width="656" height="58" rx="9" fill="#0e1628" stroke="rgba(167,139,250,.5)"/>
+        <rect x="12" y="94" width="656" height="3" fill="url(#ukGv)"/>
+        <text x="26" y="116" fill="#a78bfa" font-size="11" font-weight="bold">融合层</text>
+        <text x="340" y="116" text-anchor="middle" fill="#c084fc" font-size="11.5" font-weight="bold">联邦检索：并行检索四源 → 分数归一化 → RRF / bge-reranker 重排 → 权限前置过滤 → SimHash 去重</text>
+        <text x="340" y="136" text-anchor="middle" fill="#8fa3c4" font-size="9.5">源路由 Router │ 引用溯源（来源徽标 + 更新时间 + 原文链接）│ 降级熔断 │ 问答缓存</text>
+        <line x1="340" y1="152" x2="340" y2="168" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 索引层 -->
+        <rect x="12" y="170" width="656" height="58" rx="9" fill="#0e1628" stroke="rgba(52,211,153,.5)"/>
+        <rect x="12" y="170" width="656" height="3" fill="url(#ukGg)"/>
+        <text x="26" y="192" fill="#34d399" font-size="11" font-weight="bold">索引层</text>
+        <text x="340" y="192" text-anchor="middle" fill="#2dd4bf" font-size="11.5" font-weight="bold">统一元数据注册表 + 向量 / 全文索引（自建主库承载）</text>
+        <text x="340" y="212" text-anchor="middle" fill="#8fa3c4" font-size="9.5">CanonicalDoc 统一模型（source / acl / content_hash / quality_score / origin_url）· 跨源去重 · 质量分排序加权</text>
+        <line x1="340" y1="228" x2="340" y2="244" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 接入层 -->
+        <rect x="12" y="246" width="656" height="88" rx="9" fill="#0e1628" stroke="rgba(96,165,250,.5)"/>
+        <rect x="12" y="246" width="656" height="3" fill="url(#ukGc)"/>
+        <text x="26" y="268" fill="#60a5fa" font-size="11" font-weight="bold">接入层</text>
+        <text x="340" y="268" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="bold">Knowledge Connector 适配器（统一接口，隔离第三方差异）</text>
+        <text x="340" y="283" text-anchor="middle" fill="#5b6c8c" font-size="9">每个适配器实现：list(cursor) / fetch(ref) / search(query) / write_back(doc) / watch(cb)</text>
+        <rect x="24" y="292" width="150" height="32" rx="7" fill="#0e1628" stroke="rgba(52,211,153,.45)"/>
+        <text x="99" y="312" text-anchor="middle" fill="#34d399" font-size="10.5">① 自建适配器（原生）</text>
+        <rect x="186" y="292" width="150" height="32" rx="7" fill="#0e1628" stroke="rgba(34,211,238,.45)"/>
+        <text x="261" y="312" text-anchor="middle" fill="#22d3ee" font-size="10.5">② ima 适配器</text>
+        <rect x="348" y="292" width="150" height="32" rx="7" fill="#0e1628" stroke="rgba(167,139,250,.45)"/>
+        <text x="423" y="312" text-anchor="middle" fill="#a78bfa" font-size="10.5">③ 钉钉文档适配器</text>
+        <rect x="510" y="292" width="146" height="32" rx="7" fill="#0e1628" stroke="rgba(251,191,36,.45)"/>
+        <text x="583" y="312" text-anchor="middle" fill="#fbbf24" font-size="10.5">④ 腾讯文档适配器</text>
+        <line x1="340" y1="334" x2="340" y2="348" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 同步层 -->
+        <rect x="12" y="350" width="656" height="50" rx="9" fill="#0e1628" stroke="rgba(251,191,36,.5)"/>
+        <rect x="12" y="350" width="656" height="3" fill="url(#ukGa)"/>
+        <text x="26" y="372" fill="#fbbf24" font-size="11" font-weight="bold">同步层</text>
+        <text x="340" y="372" text-anchor="middle" fill="#fcd34d" font-size="11">事件推送（Webhook） + 定时增量拉取 + 周级全量对账</text>
+        <text x="340" y="390" text-anchor="middle" fill="#8fa3c4" font-size="9.5">幂等 content_hash │ 冲突消解（主源优先级 自建&gt;钉钉&gt;腾讯&gt;ima，禁止静默覆盖）│ 配额限流与错峰 │ 频率分级</text>
+        <line x1="340" y1="400" x2="340" y2="414" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 沉淀层 -->
+        <rect x="12" y="416" width="656" height="44" rx="9" fill="#0e1628" stroke="rgba(244,114,182,.5)"/>
+        <rect x="12" y="416" width="656" height="3" fill="url(#ukGp)"/>
+        <text x="26" y="436" fill="#f472b6" font-size="11" font-weight="bold">沉淀层</text>
+        <text x="340" y="436" text-anchor="middle" fill="#f9a8d4" font-size="11">定稿触发 → 结构化抽取 → 质量评分 → 准入判定 → 去重合并 → 回写目标库 → 索引更新 + 审计</text>
+        <text x="340" y="452" text-anchor="middle" fill="#5b6c8c" font-size="9">沉淀后的条目在下次撰写同类文档时自动进入 RAG 上下文：同类文档撰写耗时随沉淀量递减</text>
+      </svg>
+    </div>
+    <div class="card">
+      <h3>三种接入模式与联邦检索</h3>
+      <table>
+        <tr><th>接入模式</th><th>适用</th><th>做法</th><th>取舍</th></tr>
+        <tr><td><b style="color:var(--green)">A. 原生托管</b></td><td>自建库</td><td>直接写入统一索引，结构化字段完备</td><td>质量最高，需录入人力</td></tr>
+        <tr><td><b style="color:var(--cyan)">B. 镜像同步（推荐优先）</b></td><td>钉钉文档、腾讯文档</td><td>导出 markdown → 规范化 → 入自建索引，保留 origin_url 回链</td><td>检索质量高、可离线、支持统一重排；需处理增量与配额</td></tr>
+        <tr><td><b style="color:var(--amber)">C. 检索代理（兜底）</b></td><td>导出受限或成本过高</td><td>不搬运原文，实时转发检索请求，结果归一化为 CanonicalDoc 参与融合排序</td><td>零存储、始终最新；受源平台检索能力约束，不可离线</td></tr>
+      </table>
+      <p class="note" style="margin-top:12px">决策规则：<b style="color:var(--cyan)">能镜像则镜像，不能镜像才代理</b>。镜像模式保证检索质量可控（统一分块 / 向量 / 重排），是「单一答案」目标的前提；代理模式仅用于补充长尾来源。ima 采用<b>混合模式</b>——平台侧维护索引镜像用于融合排序，写入侧直接调用 add_knowledge 保证与用户在 ima 端操作一致。</p>
+      <p style="font-size:12.5px;margin-top:10px">联邦检索链路：<span class="pill cyan">意图与分域识别</span> <span style="color:var(--dim)">→</span> <span class="pill vio">源路由选源+权重</span> <span style="color:var(--dim)">→</span> <span class="pill amb">并行检索 N 源</span> <span style="color:var(--dim)">→</span> <span class="pill grn">分数归一化</span> <span style="color:var(--dim)">→</span> <span class="pill cyan">RRF / 重排融合</span> <span style="color:var(--dim)">→</span> <span class="pill vio">权限过滤 + 去重</span> <span style="color:var(--dim)">→</span> <span class="pill amb">Top-K + 引用溯源</span></p>
+      <p class="note">关键设计：各源分数分布不同（向量余弦 vs BM25 vs 平台自有分），必须先归一化再融合，否则高分源会系统性压过其它源；单源超时 / 限流时标记「该源未参与本次检索」并提示，<b>不阻塞整体返回</b>。</p>
+    </div>
+    <div class="card">
+      <h3>文档 / 文章撰写 → 知识沉淀闭环</h3>
+      <p style="font-size:12.5px;margin-bottom:12px">统一平台从「能查」到「越用越强」的关键：<b style="color:var(--green)">让每一次撰写都变成资产，而不是消耗</b>。</p>
+      <p style="font-size:12.5px;margin-bottom:12px"><span class="pill cyan">文档Agent生成初稿</span> <span style="color:var(--dim)">→</span> <span class="pill vio">人工定稿（协作平台）</span> <span style="color:var(--dim)">→</span> <span class="pill amb">定稿事件触发沉淀管线</span> <span style="color:var(--dim)">→</span> <span class="pill grn">抽取 → 评分 → 准入 → 去重 → 回写 → 索引+审计</span></p>
+      <table>
+        <tr><th>沉淀分级</th><th>内容范围</th><th>处理方式</th><th>对外 MCP 可见</th></tr>
+        <tr><td>① 公开可复用</td><td>政策解读 / 模板 / 方法论 / 通用文章</td><td>入全库</td><td class="ok">✅ 是</td></tr>
+        <tr><td>② 含客户信息</td><td>项目交付物 / 案例</td><td>脱敏后入模板库 · 成果库，原文留项目库且仅内部可见</td><td class="warn">⚠️ 仅脱敏版</td></tr>
+        <tr><td>③ 敏感档案</td><td>客户档案 / 财务数据</td><td>不沉淀，仅项目内可见</td><td class="no">❌ 否</td></tr>
+      </table>
+      <p class="note">质量准入：引用率 ≥1 条可溯源依据、重复率 &lt;30%、质量分 ≥85 才入库，未达标进「待完善」队列；条目版本化管理可回滚；贡献人采纳率纳入绩效与专家评级；<b>反哺写作</b>——沉淀条目在下次撰写同类文档时自动进入 RAG 上下文，同类文档撰写耗时随沉淀量递减。</p>
+    </div>
+    <div class="card">
+      <h3>MCP 工具升级（对外输出）</h3>
+      <table>
+        <tr><th>MCP 工具</th><th>升级内容</th></tr>
+        <tr><td><b style="color:var(--cyan)">search_knowledge</b>(query, domain)</td><td>增加可选 sources 参数（默认全部），返回片段带来源徽标与原文链接；<b>对外仅暴露「公开可复用」分级内容</b>，客户资料不出内网</td></tr>
+        <tr><td><b style="color:var(--green)">list_knowledge_sources</b>()（新增）</td><td>返回已接入知识源清单与健康状态，供 Agent 判断可用范围</td></tr>
+        <tr><td><b style="color:var(--violet)">sediment_document</b>(doc, target)（新增·写操作）</td><td>文档定稿后沉淀回写，沿用 session_token 两段式鉴权；目标库默认自建主库，跨库同步需显式指定</td></tr>
+      </table>
+      <p class="note">跨源检索按「实际调用源数」计费与限流，防止一次查询打满多源配额；全量审计调用链（问题 → 命中源 → 回写目标）。</p>
+    </div>
+  </section>
+
+  <!-- 权限矩阵 -->
+  <section id="perm">
+    <div class="sec-head"><span class="no">08</span><h2>知识库权限矩阵</h2><div class="line"></div></div>
+    <div class="card">
+      <p style="font-size:13px;margin-bottom:12px">检索时先算<b>可见域</b>再查库：从会话取角色 → 计算 visibility 列表（public / premium / expert / internal）→ 前置过滤后返回，命中数与「因可见域被过滤」条数同时返回，便于用户感知。</p>
+      <table>
+        <tr><th>角色</th><th>政策库</th><th>模板库</th><th>成果库</th><th>客户案例库</th><th>训练语料库</th></tr>
+        <tr><td>基础用户 BASIC</td><td class="ok">✅ 公开全文</td><td class="warn">⚠️ 基础模板</td><td class="no">❌</td><td class="no">❌</td><td class="no">❌</td></tr>
+        <tr><td>高级用户 PREMIUM</td><td class="ok">✅ 全文</td><td class="ok">✅ 全部</td><td class="ok">✅ 全文</td><td class="warn">⚠️ 脱敏后</td><td class="no">❌</td></tr>
+        <tr><td>课题专家 EXPERT</td><td class="ok">✅ 全文</td><td class="ok">✅ 本单相关</td><td class="ok">✅ 脱敏成果</td><td class="no">❌</td><td class="no">❌</td></tr>
+        <tr><td>管理员 ADMIN</td><td class="ok">✅ 全部</td><td class="ok">✅ 全部</td><td class="ok">✅ 全部</td><td class="warn">⚠️ 双人登记</td><td class="warn">⚠️ 双人登记</td></tr>
+      </table>
+      <p class="note">✅=可检索原文 ｜ ⚠️=受限访问（仅摘要/脱敏） ｜ ❌=不可访问。实际配置以业务方最终确认为准。</p>
+    </div>
+  </section>
+
+  <!-- 分期路线 -->
+  <section id="road">
+    <div class="sec-head"><span class="no">09</span><h2>轻量化分期建设路线</h2><div class="line"></div></div>
+    <!-- 轻量化分阶段建设路线图 -->
+    <div class="card" style="padding:18px">
+      <h3>轻量化分阶段建设路线图（v2.5）</h3>
+      <p class="note" style="margin-bottom:12px">知识库与文档撰写优先启动（阶段0-1，零自研代码起步），核心业务与 Agent/微调按需后置，每阶段设量化验收标准，不达标不进入下一阶段。</p>
+      <svg viewBox="0 0 680 340" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg" font-family="'宋体',SimSun,serif">
+        <defs>
+          <linearGradient id="roadG0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+          <linearGradient id="roadG1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#818cf8"/></linearGradient>
+          <linearGradient id="roadG2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#c084fc"/></linearGradient>
+          <linearGradient id="roadG3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f472b6"/><stop offset="1" stop-color="#fb7185"/></linearGradient>
+          <marker id="roadArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#5b6c8c"/>
+          </marker>
+        </defs>
+        <rect x="0" y="0" width="680" height="340" rx="12" fill="#0b1120" stroke="rgba(96,165,250,.2)"/>
+        <text x="340" y="26" text-anchor="middle" fill="#8fa3c4" font-size="11.5" letter-spacing="2">12 个月 · 四阶段轻量化路线</text>
+        <!-- 时间轴 -->
+        <text x="86" y="48" text-anchor="middle" fill="#5b6c8c" font-size="10">第1-2月</text>
+        <text x="255" y="48" text-anchor="middle" fill="#5b6c8c" font-size="10">第3-4月</text>
+        <text x="424" y="48" text-anchor="middle" fill="#5b6c8c" font-size="10">第5-8月</text>
+        <text x="593" y="48" text-anchor="middle" fill="#5b6c8c" font-size="10">第9-12月</text>
+        <!-- 阶段0 -->
+        <rect x="14" y="60" width="145" height="238" rx="10" fill="#0e1628" stroke="rgba(34,211,238,.55)"/>
+        <rect x="14" y="60" width="145" height="3" fill="url(#roadG0)"/>
+        <text x="86" y="82" text-anchor="middle" fill="#22d3ee" font-size="10.5" font-weight="bold" letter-spacing="1">阶段0 · ★优先启动</text>
+        <text x="86" y="100" text-anchor="middle" fill="#e6edf7" font-size="11.5" font-weight="bold">知识库+文档MVP</text>
+        <line x1="30" y1="110" x2="143" y2="110" stroke="rgba(96,165,250,.15)"/>
+        <text x="30" y="128" fill="#8fa3c4" font-size="9.5">▸ Dify+Qwen3.5-9B</text>
+        <text x="30" y="144" fill="#8fa3c4" font-size="9.5">▸ pgvector 三库入库</text>
+        <text x="30" y="160" fill="#8fa3c4" font-size="9.5">▸ 选题/初稿/润色</text>
+        <text x="30" y="176" fill="#8fa3c4" font-size="9.5">▸ rag-server MCP</text>
+        <text x="30" y="192" fill="#8fa3c4" font-size="9.5">▸ 零自研代码</text>
+        <rect x="30" y="204" width="113" height="76" rx="6" fill="rgba(34,211,238,.06)" stroke="rgba(34,211,238,.25)"/>
+        <text x="86" y="222" text-anchor="middle" fill="#22d3ee" font-size="9.5" font-weight="bold">验收标准</text>
+        <text x="86" y="238" text-anchor="middle" fill="#8fa3c4" font-size="9">条目 ≥3,000</text>
+        <text x="86" y="253" text-anchor="middle" fill="#8fa3c4" font-size="9">50问准确率 ≥85%</text>
+        <text x="86" y="268" text-anchor="middle" fill="#8fa3c4" font-size="9">3名顾问留存</text>
+        <!-- 阶段1 -->
+        <rect x="183" y="60" width="145" height="238" rx="10" fill="#0e1628" stroke="rgba(96,165,250,.4)"/>
+        <rect x="183" y="60" width="145" height="3" fill="url(#roadG1)"/>
+        <text x="255" y="82" text-anchor="middle" fill="#60a5fa" font-size="10.5" font-weight="bold" letter-spacing="1">阶段1 · 第3-4月</text>
+        <text x="255" y="100" text-anchor="middle" fill="#e6edf7" font-size="11.5" font-weight="bold">文档撰写工程化</text>
+        <line x1="199" y1="110" x2="312" y2="110" stroke="rgba(96,165,250,.15)"/>
+        <text x="199" y="128" fill="#8fa3c4" font-size="9.5">▸ OnlyOffice 协同</text>
+        <text x="199" y="144" fill="#8fa3c4" font-size="9.5">▸ POI 模板引擎双通道</text>
+        <text x="199" y="160" fill="#8fa3c4" font-size="9.5">▸ SimHash 查重降重</text>
+        <text x="199" y="176" fill="#8fa3c4" font-size="9.5">▸ 轻量单体后台</text>
+        <text x="199" y="192" fill="#8fa3c4" font-size="9.5">▸ doc-server MCP</text>
+        <rect x="199" y="204" width="113" height="76" rx="6" fill="rgba(96,165,250,.06)" stroke="rgba(96,165,250,.25)"/>
+        <text x="255" y="222" text-anchor="middle" fill="#60a5fa" font-size="9.5" font-weight="bold">验收标准</text>
+        <text x="255" y="238" text-anchor="middle" fill="#8fa3c4" font-size="9">申报书初稿 ≤1个工作日</text>
+        <text x="255" y="253" text-anchor="middle" fill="#8fa3c4" font-size="9">模板资产 Git 版本化</text>
+        <text x="255" y="268" text-anchor="middle" fill="#8fa3c4" font-size="9">修订差分开始积累</text>
+        <!-- 阶段2 -->
+        <rect x="352" y="60" width="145" height="238" rx="10" fill="#0e1628" stroke="rgba(167,139,250,.4)"/>
+        <rect x="352" y="60" width="145" height="3" fill="url(#roadG2)"/>
+        <text x="424" y="82" text-anchor="middle" fill="#a78bfa" font-size="10.5" font-weight="bold" letter-spacing="1">阶段2 · 第5-8月</text>
+        <text x="424" y="100" text-anchor="middle" fill="#e6edf7" font-size="11.5" font-weight="bold">核心业务上线</text>
+        <line x1="368" y1="110" x2="481" y2="110" stroke="rgba(96,165,250,.15)"/>
+        <text x="368" y="128" fill="#8fa3c4" font-size="9.5">▸ CRM/项目管理+Flowable</text>
+        <text x="368" y="144" fill="#8fa3c4" font-size="9.5">▸ 政策爬虫自动化</text>
+        <text x="368" y="160" fill="#8fa3c4" font-size="9.5">▸ 模型升级 27B</text>
+        <text x="368" y="176" fill="#8fa3c4" font-size="9.5">▸ Nginx→APISIX 迁移</text>
+        <text x="368" y="192" fill="#8fa3c4" font-size="9.5">▸ 第一轮红队测试</text>
+        <rect x="368" y="204" width="113" height="76" rx="6" fill="rgba(167,139,250,.06)" stroke="rgba(167,139,250,.25)"/>
+        <text x="424" y="222" text-anchor="middle" fill="#a78bfa" font-size="9.5" font-weight="bold">验收标准</text>
+        <text x="424" y="238" text-anchor="middle" fill="#8fa3c4" font-size="9">全员在线使用</text>
+        <text x="424" y="253" text-anchor="middle" fill="#8fa3c4" font-size="9">MCP 稳定运行有外部接入</text>
+        <text x="424" y="268" text-anchor="middle" fill="#8fa3c4" font-size="9">高危项清零门禁</text>
+        <!-- 阶段3 -->
+        <rect x="521" y="60" width="145" height="238" rx="10" fill="#0e1628" stroke="rgba(244,114,182,.4)"/>
+        <rect x="521" y="60" width="145" height="3" fill="url(#roadG3)"/>
+        <text x="593" y="82" text-anchor="middle" fill="#f472b6" font-size="10.5" font-weight="bold" letter-spacing="1">阶段3 · 第9-12月</text>
+        <text x="593" y="100" text-anchor="middle" fill="#e6edf7" font-size="11.5" font-weight="bold">Agent化+微调</text>
+        <line x1="537" y1="110" x2="650" y2="110" stroke="rgba(96,165,250,.15)"/>
+        <text x="537" y="128" fill="#8fa3c4" font-size="9.5">▸ Spring AI 文档/政策Agent</text>
+        <text x="537" y="144" fill="#8fa3c4" font-size="9.5">▸ QLoRA 微调 v1</text>
+        <text x="537" y="160" fill="#8fa3c4" font-size="9.5">▸ model_registry 治理</text>
+        <text x="537" y="176" fill="#8fa3c4" font-size="9.5">▸ AgentOps 成本看板</text>
+        <text x="537" y="192" fill="#8fa3c4" font-size="9.5">▸ 数据闭环启动</text>
+        <rect x="537" y="204" width="113" height="76" rx="6" fill="rgba(244,114,182,.06)" stroke="rgba(244,114,182,.25)"/>
+        <text x="593" y="222" text-anchor="middle" fill="#f472b6" font-size="9.5" font-weight="bold">验收标准</text>
+        <text x="593" y="238" text-anchor="middle" fill="#8fa3c4" font-size="9">P0 ≥1,500对 微调触发</text>
+        <text x="593" y="253" text-anchor="middle" fill="#8fa3c4" font-size="9">微调提升 ≥10pp</text>
+        <text x="593" y="268" text-anchor="middle" fill="#8fa3c4" font-size="9">数据回流闭环</text>
+        <!-- 阶段箭头 -->
+        <line x1="159" y1="180" x2="181" y2="180" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#roadArr)"/>
+        <line x1="328" y1="180" x2="350" y2="180" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#roadArr)"/>
+        <line x1="497" y1="180" x2="519" y2="180" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#roadArr)"/>
+        <!-- 降级原则注记 -->
+        <rect x="14" y="306" width="652" height="26" rx="6" fill="rgba(255,255,255,.02)" stroke="rgba(96,165,250,.12)"/>
+        <text x="340" y="323" text-anchor="middle" fill="#5b6c8c" font-size="9.5">降级原则：微服务→单体 ｜ APISIX→Nginx ｜ Milvus→pgvector ｜ MCP先建2个 ｜ 27B→9B起步 —— 架构按需演进，不一步到位</text>
+      </svg>
+    </div>
+    <div class="timeline">
+      <div class="phase" style="--c1:#22d3ee;--c2:#38bdf8">
+        <div class="p">第 1-2 月 · ★优先启动</div>
+        <div class="t">阶段0 · 知识库+文档MVP</div>
+        <ul><li>Dify + Qwen3.5-9B + pgvector</li><li>政策/模板/成果三库入库</li><li>选题/初稿/润色工作流</li><li>rag-server MCP 上线</li><li>零自研代码</li></ul>
+        <span class="acc">验收：条目≥3,000 · 准确率≥85%</span>
+      </div>
+      <div class="phase" style="--c1:#60a5fa;--c2:#818cf8">
+        <div class="p">第 3-4 月</div>
+        <div class="t">阶段1 · 文档撰写工程化</div>
+        <ul><li>OnlyOffice协同编辑</li><li>POI模板引擎双通道</li><li>SimHash查重降重</li><li>轻量单体后台</li><li>doc-server MCP 上线</li></ul>
+        <span class="acc">验收：初稿≤1个工作日</span>
+      </div>
+      <div class="phase" style="--c1:#a78bfa;--c2:#c084fc">
+        <div class="p">第 5-8 月</div>
+        <div class="t">阶段2 · 核心业务上线</div>
+        <ul><li>CRM/项目管理 + Flowable</li><li>政策爬虫自动化</li><li>模型升级 27B</li><li>Nginx→APISIX 迁移</li><li>第一轮红队测试</li></ul>
+        <span class="acc">验收：全员在线 · MCP稳定运行</span>
+      </div>
+      <div class="phase" style="--c1:#f472b6;--c2:#fb7185">
+        <div class="p">第 9-12 月</div>
+        <div class="t">阶段3 · Agent化+微调</div>
+        <ul><li>Spring AI 文档/政策Agent</li><li>QLoRA 微调 v1（P0≥1,500对）</li><li>model_registry 治理</li><li>AgentOps 成本看板</li><li>数据闭环启动</li></ul>
+        <span class="acc">验收：微调提升≥10pp</span>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>降级对照与触发条件（节选）</h3>
+      <table>
+        <tr><th>维度</th><th>起步形态</th><th>终态</th><th>升级触发</th></tr>
+        <tr><td>应用架构</td><td>Spring Boot 单体 + Dify</td><td>微服务集群</td><td>构建&gt;10min / 并发&gt;200 / 团队&gt;12人等（5项满足2项）</td></tr>
+        <tr><td>API入口</td><td>Nginx（limit_req）</td><td>APISIX（按key配额/用量仪表盘）</td><td><b style="color:var(--cyan)">阶段2第6个月完成迁移</b></td></tr>
+        <tr><td>向量库</td><td>pgvector</td><td>Milvus</td><td>条目&gt;50万</td></tr>
+        <tr><td>编排</td><td>Docker Compose</td><td>K8s</td><td>弹性伸缩/高可用需求</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 治理与成本 -->
+  <section id="ops">
+    <div class="sec-head"><span class="no">10</span><h2>AgentOps 治理与成本</h2><div class="line"></div></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>AI 运行成本估算（初期）</h3>
+        <table>
+          <tr><th>项目</th><th>初期月估</th></tr>
+          <tr><td>推理（Qwen3.5-27B 自建GPU）</td><td>¥4,500</td></tr>
+          <tr><td>云GPU训练（QLoRA季度+全参年2次）</td><td>≈¥450</td></tr>
+          <tr><td>存储/带宽/常规服务器</td><td>增量不大</td></tr>
+          <tr><td><b>合计</b></td><td><b style="color:var(--amber)">约 ¥5,000-6,000/月</b></td></tr>
+        </table>
+        <p class="note">推理自建GPU是最大固定成本；若改用 DeepSeek 官方 API 可降至 ¥30/月级，代价是数据出内网——安全与成本需管理层决策。</p>
+      </div>
+      <div class="card">
+        <h3>Token 成本精益管理</h3>
+        <p style="font-size:13px">模型分级路由（9B/27B按场景）｜ Prompt前缀缓存+语义缓存 ｜ 上下文压缩（摘要化）｜ 按Agent/用户/日配额 ｜ AI Cost Dashboard 按业务线/客户端出账。</p>
+        <h3 style="margin-top:14px">四基准检查单</h3>
+        <p style="font-size:13px"><b style="color:var(--green)">安全可控</b>（全量审计） ｜ <b style="color:var(--cyan)">专业可靠</b>（评测门禁+人工兜底） ｜ <b style="color:var(--violet)">能力可成长</b>（数据闭环） ｜ <b style="color:var(--amber)">价值可计量</b>（产出/采纳率统计）。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 安全 -->
+  <section id="sec">
+    <div class="sec-head"><span class="no">11</span><h2>安全设计</h2><div class="line"></div></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>AI 三重失控应对</h3>
+        <p style="font-size:13px"><b style="color:var(--amber)">人对AI失控</b>：MCP工具粒度权限 + 高风险操作二次确认 + 全审计<br>
+        <b style="color:var(--amber)">AI自身失控</b>：高风险"模型提议+确定性代码执行" + 输出引用溯源 + 置信度阈值转人工<br>
+        <b style="color:var(--amber)">数据泄露</b>：脱敏后入语料 + 检索权限前置 + 本地部署数据不出内网</p>
+      </div>
+      <div class="card">
+        <h3>红队测试（上线门禁）</h3>
+        <p style="font-size:13px">四类攻击模拟：<b>Prompt注入绕过权限</b>（garak/promptfoo）、<b>Token配额DoS</b>（k6压测）、<b>越权操作诱导</b>、<b>外网内容投毒</b>。高危项清零才可上线，测试记录归档作为监管证明。</p>
+        <p style="font-size:12.5px;margin-top:8px" class="note">存储加密：MinIO SSE-KMS ｜ PostgreSQL pgcrypto 字段级加密 ｜ Redis 不存 PII。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="v">课题智慧坊-AI智能平台架构设计方案 · v3.0</p>
+    <p>全栈开源技术构建 ｜ 训练算力按需云租用、推理算力自建 ｜ 所有AI产出强制人工评审兜底</p>
+    <p style="margin-top:6px">本页为方案演示版，完整技术细节以 Markdown 方案文档为准</p>
+  </footer>
+
+  </div><!-- /view-plan -->
+
+</main>
+
+<button class="scroll-top" id="topBtn" title="回到顶部">↑</button>
+
+<script>
+  // 北京时间
+  function tick(){
+    var now = new Date();
+    var bj = new Date(now.getTime() + 8*3600*1000);
+    var p = function(n){return n<10?'0'+n:n};
+    document.getElementById('clock').textContent =
+      '北京 ' + bj.getUTCFullYear() + '-' + p(bj.getUTCMonth()+1) + '-' + p(bj.getUTCDate()) +
+      ' ' + p(bj.getUTCHours()) + ':' + p(bj.getUTCMinutes()) + ':' + p(bj.getUTCSeconds());
+  }
+  setInterval(tick,1000); tick();
+  // 顶部菜单：方案总览（回顶） ↔ 动态演示版·即将上线（跳转动态演示版外链）
+  var btnPlan = document.getElementById('btnPlan');
+  var btnFront = document.getElementById('btnFront');
+  btnPlan.addEventListener('click', function(e){ e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); });
+  btnFront.addEventListener('click', function(e){
+    e.preventDefault();
+    /* 动态演示版部署中，敬请期待 */
+  });
+  // 回到顶部
+  var topBtn = document.getElementById('topBtn');
+  window.addEventListener('scroll',function(){
+    topBtn.style.display = window.scrollY > 400 ? 'block' : 'none';
+  });
+  topBtn.addEventListener('click',function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+</script>
+</body>
+</html>
