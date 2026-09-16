@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>课题智慧坊-AI智能平台 · 架构设计方案 Demo · v3.0</title>
+<title>课题智慧坊-AI智能平台 · 架构设计方案 Demo · v3.2.1</title>
 <style>
   :root{
     --bg:#070b16; --bg2:#0b1120; --panel:#0e1628; --panel2:#111b31;
@@ -140,14 +140,14 @@
     border:1px solid var(--line2);background:rgba(17,27,49,.9);color:var(--cyan);font-size:18px;
     cursor:pointer;display:none;z-index:99;transition:.3s}
   .scroll-top:hover{box-shadow:var(--glow)}
-  /* 视图切换菜单（方案总览 ↔ 动态演示版·即将上线） */
+  /* 视图切换菜单（方案总览 ↔ 前端页面演示） */
   .view-switch{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-shrink:0}
   .view-switch .menu-switch{display:block;padding:6px 14px;font-size:12.5px;color:var(--sub);
     text-decoration:none;letter-spacing:.5px;transition:.25s;cursor:pointer}
   .view-switch .menu-switch:hover{color:var(--cyan)}
   .view-switch .menu-switch.on{background:linear-gradient(135deg,rgba(34,211,238,.16),rgba(139,92,246,.16));
     color:var(--cyan);box-shadow:inset 0 0 0 1px var(--line2)}
-  /* 动态演示版·即将上线：点击顶部菜单跳转至独立子页面（非内嵌） */
+  /* 前端页面演示：点击顶部菜单跳转至独立子页面（非内嵌） */
 </style>
 </head>
 <body>
@@ -161,7 +161,7 @@
   </div>
   <div class="view-switch">
     <a href="#" id="btnPlan" class="menu-switch on">方案总览</a>
-    <a href="#" id="btnFront" class="menu-switch">动态演示版·即将上线</a>
+    <a href="#" id="btnFront" class="menu-switch">前端页面演示</a>
   </div>
   <div class="clock" id="clock">--:--:--</div>
 </nav>
@@ -174,15 +174,15 @@
   <div class="hero">
     <div class="badge">全栈开源 · AI原生 · 双协议标准</div>
     <h1>课题智慧坊 · AI智能平台</h1>
-    <p class="sub">面向课题研究与材料撰写的 AI 生产力平台：四类用户角色 × 三端工作台，覆盖统一知识平台、Agent 智能编排、模型训练微调、MCP 能力输出与轻量化分期建设。</p>
-    <p class="ver">v3.0 · 2026-09-15 · 编制：资深系统架构师</p>
+    <p class="sub">面向课题研究与材料撰写的 AI 生产力平台：四类用户角色 × 三端工作台，覆盖统一知识平台、课题申报私有化知识库、课题中心与公告栏、Agent 智能编排、模型训练微调、MCP 能力输出与轻量化分期建设。</p>
+    <p class="ver">v3.2.1 · 2026-09-16 · 编制：资深系统架构师</p>
     <div class="stats">
       <div class="stat"><b>4</b><span>类用户角色</span></div>
       <div class="stat"><b>3</b><span>端工作台</span></div>
       <div class="stat"><b>5</b><span>业务Agent</span></div>
       <div class="stat"><b>5</b><span>MCP Server</span></div>
-      <div class="stat"><b>4</b><span>知识源统一接入</span></div>
-      <div class="stat"><b>0</b><span>商业授权依赖</span></div>
+      <div class="stat"><b>8</b><span>写作模板套数</span></div>
+      <div class="stat"><b>13</b><span>张业务数据表</span></div>
     </div>
   </div>
 
@@ -566,6 +566,131 @@
     </div>
   </section>
 
+  <!-- 私有化知识库系统（v3.1，5.8） -->
+  <section id="pk">
+    <div class="sec-head"><span class="no">08</span><h2>课题申报私有化知识库系统</h2><div class="line"></div></div>
+    <div class="card">
+      <p><b style="color:var(--violet)">v3.1 新增</b>：在 5.6 统一知识平台（多源检索）与 5.7 文档撰写工作台（模板+AI 审核）的<b>通用底座</b>之上，新增一条面向课题申报全生命周期（立项→开题→研究过程→中期→结题）的<b>私有化垂直写作流水线</b>。复用平台既有 bge-m3 向量服务与本地 PostgreSQL 项目档案库，但在课题私有化场景采用专用技术栈，解决「通用知识问答 ≠ 课题全周期可追溯写作」的断层。</p>
+      <p class="note">核心结论：基础设施层 MinerU + BGE-M3 + Milvus + Ollama + LangGraph；业务逻辑层借鉴 Grant-Master 五阶段流水线；生成层补 Prismer.AI 式引用验证。质量基线：Recall@5 97.5% · 来源召回率 98% · 无依据回答率 &lt;5%。</p>
+    </div>
+    <div class="arch">
+      <div class="layer"><span class="tag t1">服务层</span><div class="items"><span>立项写作</span><span>开题写作</span><span>过程材料</span><span>中期检查</span><span>结题报告</span><span>知识库</span></div></div>
+      <div class="layer"><span class="tag t2">项目档案与模板层</span><div class="items"><span class="hl">项目档案库</span><span class="hl">框架模板库</span><span class="hl">跨阶段内容继承引擎</span></div></div>
+      <div class="layer"><span class="tag t3">生成层</span><div class="items"><span>Ollama + DeepSeek-R1</span><span>分块生成</span><span>引用强制</span><span>拒答机制</span><span>格式校验</span></div></div>
+      <div class="layer"><span class="tag t4">检索层</span><div class="items"><span class="hl">Milvus</span><span class="hl">BGE-M3</span><span>BGE-Reranker</span><span>混合检索</span><span>元数据过滤</span><span>课题专属库</span></div></div>
+      <div class="layer"><span class="tag t5">数据摄入层</span><div class="items"><span class="hl">MinerU</span><span>PDF/DOCX 解析</span><span>公式/表格保真</span><span>Parent-Child 语义切分</span></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>写作流水线 · Grant-Master 五阶段</h3>
+        <table>
+          <tr><th>阶段</th><th>输入</th><th>输出</th></tr>
+          <tr><td>① 课题准备</td><td>申报指南/关键词</td><td>课题画像与边界定义</td></tr>
+          <tr><td>② 文献调研</td><td>关键词+上传文献</td><td>文献综述结构化卡片</td></tr>
+          <tr><td>③ 方案制定</td><td>课题画像+文献</td><td>技术路线与研究方法</td></tr>
+          <tr><td>④ 大纲规划</td><td>方案+模板</td><td>申报书 Markdown 骨架</td></tr>
+          <tr><td>⑤ 正文写作</td><td>大纲+知识库</td><td>各章节初稿（引用强制）</td></tr>
+        </table>
+        <p class="note">每阶段明确输入/输出/质量门禁；项目目录 preparation/literature/scheme/outline/writing/history 解决多阶段复用与版本可追溯。</p>
+      </div>
+      <div class="card">
+        <h3>引用验证 · Prismer.AI 思路</h3>
+        <p>LLM 会系统性「幻觉」引用。在生成层之后增加 <b style="color:var(--cyan)">verify_citations</b> 节点，对每条 [来源:文件名, 第X页] 调用学术库核验（Semantic Scholar / arXiv / CrossRef）：</p>
+        <p style="font-size:13px;margin-top:8px"><span class="pill grn">核验通过 → 标记已验证入稿</span><br><span class="pill amb">核验失败 → 回退重述 / 标注待人工核验</span></p>
+        <p class="note">引用验证不可省略；LangGraph 显式编排（每个节点与路由定义在 graph 中，不藏进超长 Prompt）。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>开源技术栈选型（课题垂直增量）</h3>
+      <table>
+        <tr><th>层</th><th>首选</th><th>理由</th></tr>
+        <tr><td>文档解析</td><td><b style="color:var(--green)">MinerU</b></td><td>公式 LaTeX 与表格结构保真，开源无同等替代</td></tr>
+        <tr><td>Embedding</td><td><b style="color:var(--cyan)">BGE-M3</b></td><td>8K 窗口 + Dense/Sparse 混合检索原生支持（优于 gte-large-zh）</td></tr>
+        <tr><td>向量库</td><td><b style="color:var(--violet)">Milvus</b></td><td>原生混合检索 + 元数据过滤（Qdrant 作轻量替代）</td></tr>
+        <tr><td>编排</td><td><b style="color:var(--pink)">LangGraph</b></td><td>显式状态机，断点可恢复、可审计</td></tr>
+        <tr><td>推理</td><td>Ollama + DeepSeek-R1</td><td>完全私有化，数据不出内网</td></tr>
+      </table>
+      <p class="note">私有化 Docker Compose 部署（Milvus / Ollama / PG / backend / project-service / doc-generator / frontend）；硬件要求见方案 5.8.8。与 5.6 共用 bge-m3 Embedding 服务与本地 PG 项目档案库，未重复定义向量库。</p>
+    </div>
+  </section>
+
+  <!-- 课题中心与公告栏（v3.2，5.9） -->
+  <section id="center">
+    <div class="sec-head"><span class="no">09</span><h2>课题中心与公告栏 · 信息架构重构</h2><div class="line"></div></div>
+    <div class="card">
+      <p><b style="color:var(--violet)">v3.2 新增</b>：随着 5.6/5.7/5.8 落地，扁平侧边栏出现「工作台被占满 / 能力无归属 / 发布与查阅不对齐」三问题。本次重构——<b>公告栏独立为一级栏目</b>（政策中心 / 课题征集公告）、<b>新增用户侧一级栏目《课题中心》</b>（课题申报 / 撰写中心）、专家端增《政策发布》。</p>
+      <p class="note">一句话原则：<b>栏目承载业务动线，AI 能力跟着业务动线走</b>，而不是让用户去 AI 页找能力。《课题申报》与《撰写中心》各自内嵌 AI 撰写辅助、AI 审计七项与专家支持。</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>信息架构 · 用户端一级栏目</h3>
+        <table>
+          <tr><th>一级</th><th>二级</th><th>基础用户</th></tr>
+          <tr><td><b>课题中心</b></td><td>课题申报 / 撰写中心</td><td class="ok">✅</td></tr>
+          <tr><td><b>公告栏</b></td><td>政策中心 / 课题征集公告</td><td class="ok">✅ 全角色查阅</td></tr>
+          <tr><td>AI 工作台</td><td>工作台 / AI 助手 / 知识库</td><td class="ok">✅</td></tr>
+          <tr><td>专家服务</td><td>专家服务 / 权益与额度</td><td class="warn">⚠️ 高级档加锁</td></tr>
+          <tr><td>我的业务</td><td>我的课题 / 我的任务</td><td class="ok">✅</td></tr>
+        </table>
+        <p class="note">专家端：专家服务（接单/交付/AI加工）+ 公告运营（申报公告发布/政策发布 v3.2 新增）；管理员持平台治理 override。</p>
+      </div>
+      <div class="card">
+        <h3>公告栏 · 两栏目分工</h3>
+        <table>
+          <tr><th>维度</th><th>政策中心</th><th>课题征集公告</th></tr>
+          <tr><td>内容</td><td>申报口径（条件/方向/经费/有效期）</td><td>申报动作（通知/截止/模板/评审）</td></tr>
+          <tr><td>数据表</td><td><b>policy</b></td><td><b>announcement</b></td></tr>
+          <tr><td>派生</td><td>超期→标记已失效</td><td>到期前 N 天提醒，≤15天标红</td></tr>
+        </table>
+        <p class="note">公告与政策分开维护，但在《课题申报》栏目合流：用户只需一个「能报什么 / 何时截止 / 用哪套模板」的答案。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>课题申报 · 六步动线</h3>
+      <table>
+        <tr><th>步</th><th>用户动作</th><th>AI 撰写辅助</th><th>AI 审计</th><th>专家支持</th></tr>
+        <tr><td>①</td><td>选题与指南匹配</td><td>指南解读·选题建议</td><td>—</td><td>选题咨询</td></tr>
+        <tr><td>②</td><td>申报资格自检</td><td>条件比对·缺口提示</td><td>—</td><td>资格预判</td></tr>
+        <tr><td>③</td><td>材料与模板准备</td><td>大纲生成（模板驱动）</td><td>—</td><td>清单梳理</td></tr>
+        <tr><td>④</td><td>AI 辅助撰写</td><td>章节骨架·检索词·要素</td><td>—</td><td>首稿代笔</td></tr>
+        <tr><td>⑤</td><td>AI 审核与形式审查</td><td>—</td><td class="ok">七项全量</td><td>结构评审</td></tr>
+        <tr><td>⑥</td><td>提交与进度跟踪</td><td>—</td><td>提交前复检</td><td>答辩辅助</td></tr>
+      </table>
+      <p class="note">页面：KPI 四卡（可申报/我负责/15日内截止/推荐模板）· 六步流程条 · 我的申报（实时）· 节点提醒 · 可申报指南与政策（双源聚合）。数据由单次 <code>/api/declare/board</code> 聚合返回（Supabase REST 弱网优化）。</p>
+    </div>
+    <div class="card">
+      <h3>撰写中心 · 三栏七区工作台 ★核心</h3>
+      <p style="font-size:13px;margin-bottom:10px">左栏（稿件/模板库）· 中栏（五阶段流水线 + 章节编辑）· 右栏（AI 面板：AI 撰写辅助 / AI 审计 / 专家支持）＝把 5.7 模板审核 与 5.8 五阶段流水线 收进用户侧统一操作台。</p>
+      <table>
+        <tr><th>流水线五阶段</th><th>右栏 AI 撰写辅助（五动作）</th><th>AI 审计七项</th></tr>
+        <tr><td>① 课题准备 → ② 文献调研 → ③ 方案制定 → ④ 大纲规划 → ⑤ 正文写作</td><td>outline 大纲 / chapter 本章骨架 / condense 精炼 / depersonalize 活页匿名 / deoral 口语化</td><td>①敏感词 ②错别字 ③口语化 ④优化建议 ⑤字数 ⑥预期字数 ⑦去AI化</td></tr>
+      </table>
+      <p class="note">三条硬边界：AI 不交付终稿（标注「需人工补实」）· 不静默改写正文（两段确认写回）· 大纲不直接覆盖正文。字数口径全平台统一（中文字+英文词+数字串）。</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>基础档降级（不硬拦）</h3>
+        <table>
+          <tr><th>项</th><th>高级/专家/管理员</th><th>基础用户</th></tr>
+          <tr><td>审计规则执行</td><td>七项全量</td><td>七项全量（展示仅 ②⑤）</td></tr>
+          <tr><td>高级域模板</td><td>全部可用</td><td>全量下发+加锁（API 403 兜底）</td></tr>
+          <tr><td>稿件</td><td>全部本人稿</td><td>1 篇体验稿</td></tr>
+        </table>
+        <p class="note">降级发生在展示层与计分层，不发生在执行层——规则层零成本须全量执行，保证审计日志完整可追溯。</p>
+      </div>
+      <div class="card">
+        <h3>v3.2 新增三表</h3>
+        <table>
+          <tr><th>表</th><th>职责</th></tr>
+          <tr><td><b>policy</b></td><td>政策中心数据源（专家「政策发布」维护）</td></tr>
+          <tr><td><b>doc_template</b></td><td>写作模板库（公开/高级域，8 套）</td></tr>
+          <tr><td><b>doc_draft</b></td><td>稿件与章节、阶段、审计结果</td></tr>
+        </table>
+        <p class="note">权限点新增：pol.view/publish · ann.view/publish · write.basic/use · ai.review。状态枚举含「已下架」（漏定义会让下架链路静默不可达）。</p>
+      </div>
+    </div>
+  </section>
+
   <!-- 权限矩阵 -->
   <section id="perm">
     <div class="sec-head"><span class="no">08</span><h2>知识库权限矩阵</h2><div class="line"></div></div>
@@ -584,7 +709,7 @@
 
   <!-- 分期路线 -->
   <section id="road">
-    <div class="sec-head"><span class="no">09</span><h2>轻量化分期建设路线</h2><div class="line"></div></div>
+    <div class="sec-head"><span class="no">11</span><h2>轻量化分期建设路线</h2><div class="line"></div></div>
     <!-- 轻量化分阶段建设路线图 -->
     <div class="card" style="padding:18px">
       <h3>轻量化分阶段建设路线图（v2.5）</h3>
@@ -782,13 +907,13 @@
       ' ' + p(bj.getUTCHours()) + ':' + p(bj.getUTCMinutes()) + ':' + p(bj.getUTCSeconds());
   }
   setInterval(tick,1000); tick();
-  // 顶部菜单：方案总览（回顶） ↔ 动态演示版·即将上线（跳转动态演示版外链）
+  // 顶部菜单：方案总览（回顶） ↔ 前端页面演示（跳转动态演示版外链）
   var btnPlan = document.getElementById('btnPlan');
   var btnFront = document.getElementById('btnFront');
   btnPlan.addEventListener('click', function(e){ e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); });
   btnFront.addEventListener('click', function(e){
     e.preventDefault();
-    /* 动态演示版部署中，敬请期待 */
+    window.location.href = 'https://keti-workshop-ai-2026.app.workbuddy.host/';
   });
   // 回到顶部
   var topBtn = document.getElementById('topBtn');
