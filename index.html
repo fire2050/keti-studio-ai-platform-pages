@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>课题智慧坊-AI智能平台 · 架构设计方案 Demo · v3.2.1</title>
+<title>课题智慧坊-AI智能平台 · 架构设计方案 Demo · v3.3.2</title>
 <style>
   :root{
     --bg:#070b16; --bg2:#0b1120; --panel:#0e1628; --panel2:#111b31;
@@ -157,7 +157,7 @@
   <div class="links">
     <a href="#arch">总体架构</a><a href="#agent">Agent平台</a><a href="#model">模型训练</a>
     <a href="#stack">技术栈</a><a href="#mcp">MCP输出</a><a href="#ukp">统一知识</a><a href="#perm">权限矩阵</a>
-    <a href="#road">分期路线</a><a href="#ops">治理成本</a><a href="#sec">安全设计</a>
+    <a href="#road">分期路线</a><a href="#ops">治理成本</a><a href="#whatsnew">更新要点</a><a href="#sec">安全设计</a>
   </div>
   <div class="view-switch">
     <a href="#" id="btnPlan" class="menu-switch on">方案总览</a>
@@ -175,7 +175,7 @@
     <div class="badge">全栈开源 · AI原生 · 双协议标准</div>
     <h1>课题智慧坊 · AI智能平台</h1>
     <p class="sub">面向课题研究与材料撰写的 AI 生产力平台：四类用户角色 × 三端工作台，覆盖统一知识平台、课题申报私有化知识库、课题中心与公告栏、Agent 智能编排、模型训练微调、MCP 能力输出与轻量化分期建设。</p>
-    <p class="ver">v3.2.1 · 2026-09-16 · 编制：资深系统架构师</p>
+    <p class="ver">v3.3.2 · 2026-09-18 · 编制：资深系统架构师</p>
     <div class="stats">
       <div class="stat"><b>4</b><span>类用户角色</span></div>
       <div class="stat"><b>3</b><span>端工作台</span></div>
@@ -185,6 +185,20 @@
       <div class="stat"><b>13</b><span>张业务数据表</span></div>
     </div>
   </div>
+
+  <!-- v3.3.2 更新要点 -->
+  <section id="whatsnew">
+    <div class="sec-head"><span class="no">★</span><h2>v3.3.2 更新要点</h2><div class="line"></div></div>
+    <div class="card">
+      <p class="note">本期收口前端界面与账号体系（对应线上前端版本 v12 / v13）：登录分栏重构、新增公开注册页、管理员「账号与角色」能力增强，并制定全站 UI 一致性规范。</p>
+      <div class="stats" style="margin-top:18px">
+        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">登录界面分栏</b><span>平台介绍 + 登录对话框左右分栏，下方独立账号说明侧栏（点击自动填充演示账号）</span></div>
+        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">用户注册页</b><span>新增公开注册（POST /api/register → users 表 → 默认 basic 角色），与登录、管理后台共用数据链路</span></div>
+        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">账号与角色</b><span>管理员可手动建用户、查看角色关联用户数、行内改角色即时关联</span></div>
+        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">UI 一致性</b><span>统一「＋ 新建」主操作按钮与 .p-head 结构顺序，全站同语义动作视觉一致</span></div>
+      </div>
+    </div>
+  </section>
 
   <!-- 总体架构 -->
   <section id="arch">
