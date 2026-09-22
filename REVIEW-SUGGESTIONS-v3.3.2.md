@@ -1,6 +1,8 @@
 # 课题智慧坊-AI智能平台 架构方案 v3.3.2 · 评审意见与修改建议
 
 > 本文档供其他 Agent 参考使用。基于对 `index.html`（v3.3.2 · 2026-09-18）全文、配套业务知识（优质B套餐 ¥5,000/单、交付周期 5-7 个工作日/单）及 2026-09 公开技术情报的评估。完整架构与源码在私有仓库 `keti-studio-ai-platform`，本仓库仅为静态方案总览页。
+>
+> **配套文档**：[WEKNORA-INTEGRATION-v3.4.md](./WEKNORA-INTEGRATION-v3.4.md) — 腾讯开源 WeKnora 与知识库体系的结合修订方案（落地本文 §3.2 第 1 条运行时收敛与 §3.3 激活清单）。
 
 ## 0. 总体结论
 
@@ -48,11 +50,11 @@
 - OpenSearch 替代 Elasticsearch（规避 SSPL）；bge-m3 + bge-reranker 组合；**pgvector→Milvus 升级触发条件量化（条目>50万）**是全方案最好的 ADR；LangGraph 显式状态机、不藏超长 Prompt；AutoGen 维护模式不采用；MinerU 解析；先 RAG 后微调；MCP 工具版本管理 + Pact 契约测试。
 
 ### 3.2 需修正的问题
-1. **Agent 运行时三套并行（Spring AI 2.0 + LangGraph + Dify）是最大结构性风险**。收敛为两条腿：阶段0-1 Dify，阶段3 起 Python + LangGraph。**Spring AI 建议删除或降为备选**——RAG/评测/vLLM 生态重心在 Python 侧，为栈统一牺牲生态方向反了。
-2. **检索三轨（pgvector + OpenSearch + Milvus）**：阶段2 前只允许 pgvector（镜像）+ 源适配器（代理）两轨；OpenSearch 与 Milvus 绑定同一触发条件，不同时上。
+1. **Agent 运行时三套并行（Spring AI 2.0 + LangGraph + Dify）是最大结构性风险**。收敛为两条腿：阶段0-1 Dify，阶段3 起 Python + LangGraph。**Spring AI 建议删除或降为备选**——RAG/评测/vLLM 生态重心在 Python 侧，为栈统一牺牲生态方向反了。**v3.4 更新：结合 WeKnora 后，阶段0 主选由 Dify 改为 WeKnora（见 [WEKNORA-INTEGRATION-v3.4.md](./WEKNORA-INTEGRATION-v3.4.md) §2.1），运行时收敛为 WeKnora（知识）+ LangGraph（写作编排）两条腿。**
+2. **检索三轨（pgvector + OpenSearch + Milvus）**：阶段2 前只允许 pgvector（镜像）+ 源适配器（代理）两轨；OpenSearch 与 Milvus 绑定同一触发条件，不同时上。v3.4 更新：两轨统一由 WeKnora 承载。
 3. **模型选型时效风险（2026-09 核实）**：Qwen3.5 系列（2B/27B/122B-A10B）已发布、Apache 2.0，可用；**DeepSeek V4 9 月初仍处「即将发布」口径，「V4 Flash 284B/1M 上下文」参数属发布前信息**。改法：**写槽位不写型号**——「长文档槽位：1M 上下文 MIT 级模型，换型验收 = 评测集不回退」，与方案自带的 model_registry 治理对齐。A2A/AAIF 治理判断成立，但注明 A2A 阶段3 前不启用。
 4. **中间件超前**：RabbitMQ 可砍（Redis Streams / DB 轮询足够）；Nacos 缓上（单体阶段 Profile + Compose env）；Flowable 仅在确需 BPMN 计时器/会签/驳回语义时保留，否则 `doc_draft.status` 状态机表可扛到阶段2 末。
-5. **AGPL 传导**：MinIO/OnlyOffice CE 自用合规，但 MCP 对外输出与客户私有化部署场景会把 AGPL 组件带入服务交付链，预留 MinIO→SeaweedFS/Garage（Apache）迁移位。
+5. **AGPL 传导**：MinIO/OnlyOffice CE 自用合规，但 MCP 对外输出与客户私有化部署场景会把 AGPL 组件带入服务交付链，预留 MinIO→SeaweedFS/Garage（Apache）迁移位。v3.4 更新：若存储面随 WeKnora 方案收敛，此风险面同步缩小，但仍需审计 WeKnora 依赖许可。
 6. **OnlyOffice 协同编辑是深坑**：与 doc_draft 双向同步/冲突合并工作量历史上普遍低估 3 倍。阶段1 降级为「各写各的、docx 流转」，协同编辑推至阶段2 有专职前端再做。
 7. **可观测性四件套超配**：收敛为 Prometheus+Grafana+Loki 一套；Trace 先只做 OTel 埋点不装后端。
 
@@ -64,6 +66,8 @@ Dify + Qwen3.5-9B(vLLM/Ollama) + bge-m3 + pgvector + PostgreSQL 16
 ```
 
 共 10 个运行件，全部有降级位；其余组件按触发条件表分批唤醒。
+
+> **v3.4 更新**：结合 WeKnora 后该清单缩减为 6 件（WeKnora + Qwen3.5-9B + bge-m3 + PostgreSQL + Nginx + Compose），详见 [WEKNORA-INTEGRATION-v3.4.md](./WEKNORA-INTEGRATION-v3.4.md) §2.1。
 
 ## 4. P2 页面质量修正（零风险，顺手修）
 
@@ -83,15 +87,16 @@ Dify + Qwen3.5-9B(vLLM/Ollama) + bge-m3 + pgvector + PostgreSQL 16
 | 月总成本（含人力） | ≈¥17,000 | ≈¥17,000 | ≈¥25,000 |
 | 月净贡献 | ¥28,000 | ¥98,000 | ¥305,000 |
 
-敏感性排序：①单产倍数 ②外部专家池订单量 ③抽佣率 ④订阅转化率（<5%，不作决策依据）。除套餐 B 价格外均为待验证假设。
+敏感性排序：①单产倍数 ②外部专家池订单量 ③抽佣率 ④订阅转化率（<5%，不作决策依据）。除套餐 B 价格外均为待验证假设。v3.4 成本联动：WeKnora 结合方案使阶段0-1 人力再降约 40%，见结合文档 §2.5。
 
 ## 6. 建议的 v3.4 落地顺序
 
 1. 先改静态页 P2 三项 + P1.4 表述（零风险）；
 2. 新增「商业模型与成本口径」章节（P0.1/P0.3），同步进私有仓库 Markdown 完整方案；
 3. P0.2、P1 各条属执行计划调整，建议以「决策备忘」形式单独成文给管理层；
-4. 技术栈修正（§3.2）落入架构章节，并新增 §3.3 激活清单。
+4. 技术栈修正（§3.2）落入架构章节，并新增 §3.3 激活清单；
+5. **按 [WEKNORA-INTEGRATION-v3.4.md](./WEKNORA-INTEGRATION-v3.4.md) 执行知识库体系收敛：阶段0 第一周完成 RBAC 映射 PoC（硬前提），阶段0 底座由 Dify 改为 WeKnora，rag-server MCP 提前至周 2 上线。**
 
 ---
 
-*评审生成于 2026-09-22。技术情报核实来源：Qwen3.5 系列发布记录（百度百科/apxml，2026-05~06）、DeepSeek V4 发布动态（开源周报 2026-09-02）、MCP/A2A·AAIF 治理格局（2026-09 行业分析多篇）。模型信息半衰期约 6 个月，引用前请重新核实。*
+*评审生成于 2026-09-22。技术情报核实来源：Qwen3.5 系列发布记录（百度百科/apxml，2026-05~06）、DeepSeek V4 发布动态（开源周报 2026-09-02）、MCP/A2A·AAIF 治理格局（2026-09 行业分析多篇）、WeKnora v0.8.0（Tencent/WeKnora 仓库实测）。模型与框架信息半衰期约 6 个月，引用前请重新核实。*
