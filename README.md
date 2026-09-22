@@ -9,4 +9,5 @@
 
 ## Agent 参考文档
 
-- [REVIEW-SUGGESTIONS-v3.3.2.md](./REVIEW-SUGGESTIONS-v3.3.2.md) — 架构方案 v3.3.2 评审意见与修改建议（含成本/ARPU 模型、技术栈评估、v3.4 落地顺序），供后续修改方案的其他 Agent 参考。
+- [REVIEW-SUGGESTIONS-v3.3.2.md](./REVIEW-SUGGESTIONS-v3.3.2.md) — 架构方案 v3.3.2 评审意见与修改建议（含成本/ARPU 模型、技术栈评估、v3.4 落地顺序）。
+- [WEKNORA-INTEGRATION-v3.4.md](./WEKNORA-INTEGRATION-v3.4.md) — 腾讯开源 WeKnora（v0.8.0，MIT）与知识库体系的结合修订方案，落地评审文档的技术栈收敛建议。
