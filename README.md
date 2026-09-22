@@ -4,5 +4,9 @@
 
 - 在线预览：https://fire2050.github.io/keti-studio-ai-platform-pages/
 - 完整架构设计方案与系统源码位于私有仓库 `keti-studio-ai-platform`（不公开）。
-- 版本：v3.2.1（四角色体系 + 课题申报私有化知识库 5.8 + 课题中心与公告栏 5.9）。
+- 版本：v3.3.2（四角色体系 + 课题申报私有化知识库 5.8 + 课题中心与公告栏 5.9 + 前端界面与账号体系收口）。
 - 动态交互演示版（FastAPI 服务）已上线：https://keti-workshop-ai-2026.app.workbuddy.host/
+
+## Agent 参考文档
+
+- [REVIEW-SUGGESTIONS-v3.3.2.md](./REVIEW-SUGGESTIONS-v3.3.2.md) — 架构方案 v3.3.2 评审意见与修改建议（含成本/ARPU 模型、技术栈评估、v3.4 落地顺序），供后续修改方案的其他 Agent 参考。
