@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>课题智慧坊-AI智能平台 · 架构设计方案 Demo · v3.3.2</title>
+<title>课题智慧坊-AI智能平台 · 架构设计方案 Demo · v3.7</title>
 <style>
   :root{
     --bg:#070b16; --bg2:#0b1120; --panel:#0e1628; --panel2:#111b31;
@@ -147,6 +147,26 @@
   .view-switch .menu-switch:hover{color:var(--cyan)}
   .view-switch .menu-switch.on{background:linear-gradient(135deg,rgba(34,211,238,.16),rgba(139,92,246,.16));
     color:var(--cyan);box-shadow:inset 0 0 0 1px var(--line2)}
+  /* 窄屏适配：宽表改横向滚动，避免整页被表格撑破（原 v3.3.2 在 390px 下 doc 宽 742px） */
+  @media(max-width:760px){
+    main{padding:78px 14px 48px}
+    nav{gap:10px;padding:0 12px}
+    nav .logo{font-size:13px}
+    .hero{padding:38px 6px 30px}
+    .hero h1{font-size:29px;letter-spacing:1px}
+    .hero .sub{font-size:14px}
+    .sec-head{gap:9px}
+    .sec-head h2{font-size:18px;letter-spacing:1px}
+    .card{padding:15px;border-radius:11px}
+    .arch .layer{flex-direction:column;align-items:flex-start;gap:8px}
+    .arch .layer .tag{width:auto;align-self:stretch}
+    .card table{display:block;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    /* grid 项默认 min-width:auto 会被内部宽表撑开 → 显式允许收缩，溢出交给表格自己横向滚动 */
+    .grid2,.grid3{grid-template-columns:1fr}
+    .grid2>*,.grid3>*{min-width:0}
+    .card,.card *{overflow-wrap:anywhere}
+    .card code{word-break:break-all}
+  }
   /* 前端页面演示：点击顶部菜单跳转至独立子页面（非内嵌） */
 </style>
 </head>
@@ -155,9 +175,11 @@
 <nav>
   <div class="logo">◈ 架构方案 DEMO</div>
   <div class="links">
-    <a href="#arch">总体架构</a><a href="#agent">Agent平台</a><a href="#model">模型训练</a>
-    <a href="#stack">技术栈</a><a href="#mcp">MCP输出</a><a href="#ukp">统一知识</a><a href="#perm">权限矩阵</a>
-    <a href="#road">分期路线</a><a href="#ops">治理成本</a><a href="#whatsnew">更新要点</a><a href="#sec">安全设计</a>
+    <a href="#whatsnew">更新要点</a><a href="#arch">总体架构</a><a href="#role">用户体系</a><a href="#agent">Agent平台</a>
+    <a href="#model">模型训练</a><a href="#stack">技术栈</a><a href="#mcp">MCP输出</a><a href="#ukp">统一知识</a>
+    <a href="#pk">私有化知识库</a><a href="#center">课题中心</a><a href="#stage">六阶段轴</a><a href="#topic">智能定题</a>
+    <a href="#kbs">KBS契约</a><a href="#ann">公告智能体</a><a href="#collect">信息采集</a><a href="#perm">权限矩阵</a>
+    <a href="#road">分期路线</a><a href="#ops">治理成本</a><a href="#sec">安全设计</a>
   </div>
   <div class="view-switch">
     <a href="#" id="btnPlan" class="menu-switch on">方案总览</a>
@@ -174,29 +196,47 @@
   <div class="hero">
     <div class="badge">全栈开源 · AI原生 · 双协议标准</div>
     <h1>课题智慧坊 · AI智能平台</h1>
-    <p class="sub">面向课题研究与材料撰写的 AI 生产力平台：四类用户角色 × 三端工作台，覆盖统一知识平台、课题申报私有化知识库、课题中心与公告栏、Agent 智能编排、模型训练微调、MCP 能力输出与轻量化分期建设。</p>
-    <p class="ver">v3.3.2 · 2026-09-18 · 编制：资深系统架构师</p>
+    <p class="sub">面向课题研究与材料撰写的 AI 生产力平台：四类用户角色 × 三端工作台，覆盖统一知识平台、课题申报私有化知识库、课题中心与公告栏、六阶段课题全周期与智能定题、公告智能体（信息采集 / AI 检索与分析）、模型训练微调、MCP 对外输出与轻量化分期建设。</p>
+    <p class="ver">v3.7 · 2026-09-23 · 线上页面版本 v19 · 编制：资深系统架构师</p>
     <div class="stats">
       <div class="stat"><b>4</b><span>类用户角色</span></div>
       <div class="stat"><b>3</b><span>端工作台</span></div>
+      <div class="stat"><b>32</b><span>业务页面</span></div>
+      <div class="stat"><b>85</b><span>API 路由</span></div>
+      <div class="stat"><b>22</b><span>业务数据表</span></div>
+      <div class="stat"><b>26</b><span>权限点</span></div>
       <div class="stat"><b>5</b><span>业务Agent</span></div>
-      <div class="stat"><b>5</b><span>MCP Server</span></div>
-      <div class="stat"><b>8</b><span>写作模板套数</span></div>
-      <div class="stat"><b>13</b><span>张业务数据表</span></div>
+      <div class="stat"><b>4</b><span>MCP 只读工具</span></div>
     </div>
   </div>
 
-  <!-- v3.3.2 更新要点 -->
+  <!-- v3.7 更新要点 -->
   <section id="whatsnew">
-    <div class="sec-head"><span class="no">★</span><h2>v3.3.2 更新要点</h2><div class="line"></div></div>
+    <div class="sec-head"><span class="no">★</span><h2>v3.7 更新要点</h2><div class="line"></div></div>
     <div class="card">
-      <p class="note">本期收口前端界面与账号体系（对应线上前端版本 v12 / v13）：登录分栏重构、新增公开注册页、管理员「账号与角色」能力增强，并制定全站 UI 一致性规范。</p>
+      <p class="note">自 v3.3.2 起累计 <b>5 个版本增量</b>已全部实装并上线，线上页面版本标记 <b style="color:var(--cyan)">v19</b>。本期三件事：<b>信息采集</b>（AI 采集/检索政策公告 → 人工择选 → 走既有发布路径）、<b>专家端信息架构调整</b>（新增《知识库》一级栏目 ／ 公告运营首位加《信息采集》 ／ 撤销《资源与收益》）、<b>MCP 对外出口</b>（只读四工具，供 WorkBuddy / 千问办公等外部 Agent 调用）。</p>
       <div class="stats" style="margin-top:18px">
-        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">登录界面分栏</b><span>平台介绍 + 登录对话框左右分栏，下方独立账号说明侧栏（点击自动填充演示账号）</span></div>
-        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">用户注册页</b><span>新增公开注册（POST /api/register → users 表 → 默认 basic 角色），与登录、管理后台共用数据链路</span></div>
-        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">账号与角色</b><span>管理员可手动建用户、查看角色关联用户数、行内改角色即时关联</span></div>
-        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">UI 一致性</b><span>统一「＋ 新建」主操作按钮与 .p-head 结构顺序，全站同语义动作视觉一致</span></div>
+        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">信息采集</b><span>公告运营首位新增；三轨（seed / remote / fetch）共用同一响应 schema，候选条目经确定性打分后<b>人工择选</b>转草稿</span></div>
+        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">专家端信息架构</b><span>新增《知识库》一级栏目（资料库 / 模板中心 / 我的资料 / 知识检索）；撤销《资源与收益》，结算与收益迁入《我的业务》</span></div>
+        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">MCP 对外出口</b><span>JSON-RPC 2.0 单端点，只读四工具；<code>X-MCP-Key</code> 鉴权，可见域由 key 服务端预置，客户端传入一律 400</span></div>
+        <div class="stat" style="text-align:left"><b style="font-size:16px;line-height:1.5;background:none;-webkit-background-clip:initial;color:var(--cyan)">六阶段轴与 KBS 契约</b><span>课题全周期六阶段交付物轴（stage 真值 / progress 派生）；知识库域适配层 kb_adapter 契约先行，层级梯度服务端裁剪</span></div>
       </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>版本演进（v3.3.2 → v3.7）</h3>
+      <table>
+        <tr><th>版本</th><th>主题</th><th>状态</th></tr>
+        <tr><td><b>v3.3.3–v3.3.4</b></td><td>MCP 落地模式 A（统一网关 + 多客户端平行消费）／ 六阶段课题轴与结构视图思维导图</td><td class="ok">✅ 实装（页面 v14）</td></tr>
+        <tr><td><b>v3.3.5–v3.3.7</b></td><td>立项前定题 ／ 质量门禁 ／ 双模部署（v3.3.7 移除基金语料）</td><td class="ok">✅ 实装（页面 v15）</td></tr>
+        <tr><td><b>v3.3.8</b></td><td>智能定题：确定性规则 15 候选，<b>只生成不入库</b></td><td class="ok">✅ 实装（页面 v15）</td></tr>
+        <tr><td><b>v3.4.0 ／ v3.5.0</b></td><td>知识库治理与四级权限 ／ KBS 独立化与 MCP 输出</td><td class="warn">⚠️ 方案定稿，未实装（其 P0 由 v3.5.1 承接）</td></tr>
+        <tr><td><b>v3.5.1</b></td><td>知识库域适配层 <code>kb_adapter</code>（契约先行）</td><td class="ok">✅ 实装（页面 v16）</td></tr>
+        <tr><td><b>v3.5.2</b></td><td>公告智能体 AnnAgent 与 AI 分析（三轨引擎 + 四铁律）</td><td class="ok">✅ P0–P2 实装（页面 v17）</td></tr>
+        <tr><td><b>v3.5.2-P4</b></td><td>MCP 对外出口（只读四工具 + <code>X-MCP-Key</code>）</td><td class="ok">✅ 实装（页面 v19）</td></tr>
+        <tr><td><b>v3.6</b></td><td>开源知识库选型（WeKnora 0.8.0 作候选 A）</td><td class="warn">⚠️ 可选方案存档 · 未拍板 · 不部署</td></tr>
+        <tr><td><b>v3.7</b></td><td>信息采集 + 专家端信息架构调整</td><td class="ok">✅ 实装（页面 v19）</td></tr>
+      </table>
+      <p class="note">「未实装」与「存档」一并列出：把没做完的写在明面上，比让读者误以为全量可用更安全。<b>v3.6 编号被选型存档占用，实装增量故取 v3.7</b>——避免「v3.6 到底指什么」长期歧义。</p>
     </div>
   </section>
 
@@ -256,10 +296,10 @@
         <tr><td>模型档位</td><td>9B 小档位 + 缓存优先</td><td>27B+ 大档位 / 商用 API 智能路由</td></tr>
         <tr><td>上下文窗口</td><td>8K tokens</td><td>128K tokens（长文档整篇直入）</td></tr>
         <tr><td>长文档解析</td><td>不支持（&gt;20 页需拆分）</td><td>PDF / Word 整篇 + 大文档分级加载</td></tr>
-        <tr><td>AI 审核</td><td>仅错别字 / 标点</td><td>七项全量（敏感词三级 / 口语化 / 学术语体规范化…）</td></tr>
+        <tr><td>AI 审核</td><td>仅错别字 / 标点</td><td>七项全量（敏感词三级 / 口语化 / 去 AI 化…）</td></tr>
         <tr><td>深度研究 Agent</td><td>不可用</td><td>多轮检索 + 交叉验证 + 引用溯源</td></tr>
         <tr><td>私有知识空间</td><td>不可用</td><td>可建 10 个私有库</td></tr>
-        <tr><td>MCP 对外输出</td><td>不可用</td><td>授权后供第三方 Agent 调用</td></tr>
+        <tr><td>MCP 对外输出</td><td>不可用</td><td>可用（授权 API key）：只读 4 工具，按 key 预置可见域裁剪</td></tr>
         <tr><td>算力队列</td><td>共享队列（高峰排队）</td><td>优先队列（旺季不降级）</td></tr>
         <tr><td>月度额度</td><td>问答 100 次 / 写作 20 篇</td><td>问答 3,000 次 / 写作 200 篇</td></tr>
         <tr><td>服务等级</td><td>社区互助 · 工作日 24h</td><td>4h 响应 · SLA 99% · 专属服务群</td></tr>
@@ -677,7 +717,7 @@
       <p style="font-size:13px;margin-bottom:10px">左栏（稿件/模板库）· 中栏（五阶段流水线 + 章节编辑）· 右栏（AI 面板：AI 撰写辅助 / AI 审计 / 专家支持）＝把 5.7 模板审核 与 5.8 五阶段流水线 收进用户侧统一操作台。</p>
       <table>
         <tr><th>流水线五阶段</th><th>右栏 AI 撰写辅助（五动作）</th><th>AI 审计七项</th></tr>
-        <tr><td>① 课题准备 → ② 文献调研 → ③ 方案制定 → ④ 大纲规划 → ⑤ 正文写作</td><td>outline 大纲 / chapter 本章骨架 / condense 精炼 / depersonalize 活页匿名 / deoral 口语化</td><td>①敏感词 ②错别字 ③口语化 ④优化建议 ⑤字数 ⑥预期字数 ⑦学术语体规范化</td></tr>
+        <tr><td>① 课题准备 → ② 文献调研 → ③ 方案制定 → ④ 大纲规划 → ⑤ 正文写作</td><td>outline 大纲 / chapter 本章骨架 / condense 精炼 / depersonalize 活页匿名 / deoral 口语化</td><td>①敏感词 ②错别字 ③口语化 ④优化建议 ⑤字数 ⑥预期字数 ⑦去AI化</td></tr>
       </table>
       <p class="note">三条硬边界：AI 不交付终稿（标注「需人工补实」）· 不静默改写正文（两段确认写回）· 大纲不直接覆盖正文。字数口径全平台统一（中文字+英文词+数字串）。</p>
     </div>
@@ -705,9 +745,222 @@
     </div>
   </section>
 
+  <!-- 课题全周期 · 六阶段轴（v3.3.4） -->
+  <section id="stage">
+    <div class="sec-head"><span class="no">10</span><h2>课题全周期 · 六阶段轴</h2><div class="line"></div></div>
+    <div class="card">
+      <p><b style="color:var(--violet)">v3.3.4 新增</b>：把「一份模糊的稿件」升级为<b>六阶段交付物轴</b>。<code>stage</code> 是<b>真值</b>（稿件类型，决定用哪套模板与哪套审计口径），<code>progress</code> 是<b>派生值</b>（由阶段与完成度算出，不独立存储）。起稿时阶段由模板带出，<b class="no">非法阶段名一律 400</b>。</p>
+      <p class="note">六阶段轴与专家侧「管线七步」<b>正交</b>：前者回答「这是哪一类交付物」，后者回答「这份活干到哪一步」。二者不可互相推导，故并存而非合并——合并会让「中期报告正在专家加工」这类状态无处安放。</p>
+    </div>
+    <div class="card">
+      <h3>六阶段交付物（GET /api/stage/meta 实测返回）</h3>
+      <table>
+        <tr><th>#</th><th>阶段（stage）</th><th>交付物</th><th>内容要点</th><th>时间口径</th></tr>
+        <tr><td>1</td><td><b>课题申报书</b></td><td>课题申报书（立项申请）</td><td>选题论证、研究基础、经费预算、预期成果</td><td>申报截止前 30 天</td></tr>
+        <tr><td>2</td><td><b>开题报告</b></td><td>开题报告 + 文献综述</td><td>研究框架、技术路线、文献调研与述评</td><td>立项后 60 天内</td></tr>
+        <tr><td>3</td><td><b>中期报告</b></td><td>中期检查报告</td><td>阶段进展、已获成果、存在问题与调整方案</td><td>研究周期过半</td></tr>
+        <tr><td>4</td><td><b>过程性材料</b></td><td>过程性材料汇编</td><td>调研记录、实验数据、研讨纪要、佐证附件</td><td>随研究过程持续归集</td></tr>
+        <tr><td>5</td><td><b>结题验收</b></td><td>结题验收申请 + 成果佐证</td><td>成果清单、验收自评、经费决算</td><td>研究周期结束前 30 天</td></tr>
+        <tr><td>6</td><td><b>结项研究总报告</b></td><td>结项研究总报告</td><td>研究结论、创新点、推广应用与反思</td><td>验收通过后 30 天内</td></tr>
+      </table>
+      <p class="note">阶段名即稿件类型，<b>不引入第二套编号</b>——历史项目里「阶段 3」既是「中期」又是「方案制定」，是用户投诉的主要来源。</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>专家侧 · 管线七步（phase_flow）</h3>
+        <p style="font-size:13px;margin-bottom:10px">
+          <span class="pill cyan">待接单</span><span class="pill cyan">大纲确认</span><span class="pill vio">AI初稿</span><span class="pill vio">专家加工</span><span class="pill amb">AI审核</span><span class="pill amb">内部质控</span><span class="pill grn">已交付</span>
+        </p>
+        <p class="note">右侧三步（AI审核 / 内部质控 / 已交付）是<b>不可回退</b>的收口段：一旦进入内部质控，稿件内容变更会触发重新审计并留痕，避免「交付后再改字」绕过质量门禁。</p>
+      </div>
+      <div class="card">
+        <h3>结构视图 · 列表 ↔ 思维导图</h3>
+        <p style="font-size:13px">中栏「章节片列表」与「思维导图」是<b>同区同源的两个视图</b>，不是两个页面、也不新增区块：<code>chapters</code> 是<b>唯一权威数据</b>，导图是它的派生渲染（markmap）。一期只读派生，不接受在导图上直接改结构。</p>
+        <p class="note">加载判据<b>禁用 <code>children.length</code></b>——章节片可以有零子节点，用它判「有没有内容」会让空章节被误判为未加载。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 智能定题（v3.3.8） -->
+  <section id="topic">
+    <div class="sec-head"><span class="no">11</span><h2>智能定题 · 确定性规则引擎</h2><div class="line"></div></div>
+    <div class="card">
+      <p><b style="color:var(--violet)">v3.3.8 新增</b>：在「立项前」就给出可选题目。<b>15 条候选 = 5 个研究目标 × 3 类研究对象</b>，综合分 <code>(创新×0.4 + 价值×0.35 + 可行×0.25) × 20</code>，落在右栏 AI 面板的第 4 个 tab。</p>
+      <p class="note">⚠️ 本能力<b>不是大模型生成</b>：全部为确定性规则组合与打分，同一输入必得同一输出。演示环境无 LLM 凭据，凡标「AI」处均须能对上确定性实现。</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>两条硬边界</h3>
+        <table>
+          <tr><th>边界</th><th>行为</th><th>为什么</th></tr>
+          <tr><td>生成不入库</td><td><code>POST /api/ai/topic</code> 只返回候选；<b>采纳</b>才写 <code>topic_plan</code></td><td>避免用户"随便点一下"就污染定题台账</td></tr>
+          <tr><td>降级不静默</td><td>读<b>软降级</b>（200 + 降级说明）／写<b>硬失败</b>（503）</td><td>读可以"看到但标残缺"，写不能假装成功</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>相关接口（5 条）</h3>
+        <table>
+          <tr><th>方法</th><th>路径</th><th>说明</th></tr>
+          <tr><td>POST</td><td><code>/api/ai/topic</code></td><td>生成 15 候选（只生成不入库）</td></tr>
+          <tr><td>GET</td><td><code>/api/topic/plans</code></td><td>方案列表（<code>items</code> / <code>ready</code> / <code>count</code>）</td></tr>
+          <tr><td>POST</td><td><code>/api/topic/plans</code></td><td>保存方案</td></tr>
+          <tr><td>DELETE</td><td><code>/api/topic/plans/{tid}</code></td><td>删除方案</td></tr>
+          <tr><td>POST</td><td><code>/api/topic/plans/{tid}/adopt</code></td><td>采纳（唯一写入口）</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 知识库域适配层与 KBS 契约出口（v3.5.1） -->
+  <section id="kbs">
+    <div class="sec-head"><span class="no">12</span><h2>知识库域适配层与 KBS 契约出口</h2><div class="line"></div></div>
+    <div class="card">
+      <p><b style="color:var(--violet)">v3.5.1</b> 是知识库独立化（v3.5.0）的 <b>P0「契约先行」</b>：在 KBS 真正拆出去之前，先在平台侧立一层 <code>kb_adapter</code>，把「出口形状」定死。这样 KBS 独立部署时，<b>平台侧零改动切换</b>，前端与外部 Agent 都感知不到。</p>
+      <table style="margin-top:12px">
+        <tr><th>层</th><th>职责</th><th>边界</th></tr>
+        <tr><td><b>平台</b></td><td>前端 + BFF + 身份签发</td><td class="warn">在知识库域是<b>纯客户端</b>；在业务域仍保留身份/权限/真值</td></tr>
+        <tr><td><b>KBS</b></td><td>知识构建 · 治理 · 检索 · 生成 · MCP</td><td class="no"><b>不回写</b>平台库；可见域权威在 KBS</td></tr>
+        <tr><td><b>外部 Agent</b></td><td>WorkBuddy / 千问办公等消费方</td><td class="no">只拿只读工具，拿不到写入面</td></tr>
+      </table>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>层级梯度（GET /api/kbs/v1/health 实测）</h3>
+        <table>
+          <tr><th>项</th><th>值</th></tr>
+          <tr><td>契约版本</td><td><code>kbs/v1</code></td></tr>
+          <tr><td>可见域权威</td><td>平台 · kb_adapter（独立部署后移交 KBS）</td></tr>
+          <tr><td>内容裁剪</td><td><b>服务端裁剪</b>（server-side）</td></tr>
+          <tr><td>层级顺序</td><td><code>title → summary → teaser → content</code></td></tr>
+          <tr><td>teaser 上限</td><td><b>120</b> 字符（硬顶）</td></tr>
+          <tr><td>平台是否持有正文</td><td class="warn">否（<code>platform_holds_content: false</code>）</td></tr>
+          <tr><td>断言算法</td><td>HS256，TTL <b>300s</b>，<code>jti</code> 黑名单为进程内存</td></tr>
+        </table>
+        <p class="note">🔴 <b>未达某层时该层连键都不存在</b>——不是返回空串、也不是 <code>null</code>。这让「拿不到正文」在客户端一眼可辨，也让孩子用 <code>''</code> 判"有内容但为空"的写法直接失效。</p>
+      </div>
+      <div class="card">
+        <h3>四条防绕过硬约束</h3>
+        <table>
+          <tr><th>约束</th><th>行为</th></tr>
+          <tr><td>可见域参数</td><td>由<b>服务端推导</b>；客户端传入 → <b class="no">400</b></td></tr>
+          <tr><td>未带 token</td><td><code>/api/kbs/v1/*</code> → <b class="no">401</b>（<code>health</code> 有意免登录，且<b>不含任何条目数据</b>）</td></tr>
+          <tr><td>legacy 兼容</td><td><code>/api/kb</code> · <code>/api/sources</code> · <code>sediment</code> 响应<b>逐字段不变</b></td></tr>
+          <tr><td>远端未配置</td><td><code>KB_MODE=remote</code> 而缺 <code>KBS_BASE</code> → <b class="no">显式失败</b>，不回落本地</td></tr>
+        </table>
+        <p class="note">在册未修两项已由 <code>/api/kbs/v1/health</code> 的 <code>known_defects</code> <b>如实披露</b>：① <code>POST /api/kb/sediment</code> 缺权限校验；② <code>knowledge</code> 表暂无 <code>status</code>/<code>teaser</code>/<code>version</code> 列。<b>把已知缺陷写进自述接口</b>，比让它躺在内部清单里更安全。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 公告智能体与 MCP 对外出口（v3.5.2 / P4） -->
+  <section id="ann">
+    <div class="sec-head"><span class="no">13</span><h2>公告智能体与 MCP 对外出口</h2><div class="line"></div></div>
+    <div class="card">
+      <p><b style="color:var(--violet)">需求原文</b>：①专家公告运营加 AI 智能搜索；②高级与基础用户在公告模块加 AI 分析；③规划一个可接入 WorkBuddy / 千问办公的 Agent 助手。</p>
+      <p class="note">🔴 <b>核心判断：本需求 ≠ 接大模型。</b>平台 AI 全部是<b>确定性规则引擎、零 LLM 调用</b>（演示环境单端口、无 env 注入）。因此设计重点不是"调模型"，而是<b>引擎分层</b>：①规则内核（唯一接触数据、唯一做可见域过滤）②平台编排 ③外部 Agent 接入。三轨 <code>AGENT_MODE=off|rule|remote</code> <b>共用同一响应 schema</b>，差异只体现在 <code>engine</code> / <code>confidence</code> 两个字段。</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>四铁律</h3>
+        <table>
+          <tr><th>#</th><th>铁律</th><th>落法</th></tr>
+          <tr><td>F1</td><td>可见域<b>不可绕过</b></td><td>列表内联的角色过滤抽成唯一入口 <code>_ann_visible_rows()</code> / <code>_pol_visible_rows()</code>，列表与全部 AI 接口共用；门禁静态断言全文<b>不得再出现第二处 status 过滤字面量</b></td></tr>
+          <tr><td>F2</td><td>结论必带<b>原文锚点</b></td><td>每条结论可回溯到具体公告条目</td></tr>
+          <tr><td>F3</td><td><b>如实标注</b></td><td>响应标 <code>engine: rule</code>，明示"非向量检索、非 LLM 生成"</td></tr>
+          <tr><td>F4</td><td>外部 Agent 只给<b>只读</b>工具</td><td>白名单断言：任何写入工具都无法注册</td></tr>
+        </table>
+        <p class="note">🔴 读准入统一用 <code>_require_ann_read()</code>（<code>ann.view</code> <b>或</b> <code>ann.publish</code>）——因为 <code>ann.view</code> 的角色范围<b>不含专家</b>，只看它会让专家端整片 403。</p>
+      </div>
+      <div class="card">
+        <h3>MCP 对外出口（POST /api/mcp）</h3>
+        <table>
+          <tr><th>项</th><th>值</th></tr>
+          <tr><td>协议</td><td>JSON-RPC 2.0 单端点（<code>initialize</code> / <code>tools/list</code> / <code>tools/call</code>）</td></tr>
+          <tr><td>协议版本</td><td><code>2025-06-18</code></td></tr>
+          <tr><td>鉴权</td><td><b class="no">X-MCP-Key</b>（<code>mcp_key</code> 表只存 sha256 + hint）</td></tr>
+          <tr><td>限额</td><td>60 次/分 · 1000 次/日（按 key，进程内存）</td></tr>
+          <tr><td>工具数</td><td>恒 <b>4</b>，全部<b>只读</b></td></tr>
+        </table>
+        <p class="note">四工具：<code>ann_search</code> · <code>ann_analyze</code> · <code>pol_match</code> · <code>ann_watch_list</code>。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🔴 上线实测踩到的坑：云沙箱网关会覆写 <code>Authorization</code></h3>
+      <p style="font-size:13px">首发上线后 <code>/api/mcp/health</code> 已是 200（证明新代码生效），但<b class="no">六个 key 全部 401</b>——连确定有效的 premium/basic/admin 也一样，而本地同一份代码、同一张表、同一批 key <b class="ok">58/0 全绿</b>。</p>
+      <table style="margin-top:12px">
+        <tr><th>排查步</th><th>动作</th><th>结论</th></tr>
+        <tr><td>① 查数据</td><td>直连 PostgREST 读 <code>mcp_key</code></td><td>5 行、hash 与明文 sha256 <b>逐条命中</b> → 排除数据问题</td></tr>
+        <tr><td>② 读文案</td><td>看返回是「无效或已停用」而非「需要 API key」</td><td>两条<b>不同分支</b> → 服务端拿到了值但<b>值不对</b> → 请求被改写</td></tr>
+        <tr><td>③ 回源码</td><td>搜 <code>authorization</code></td><td>既有注释白纸黑字：<b>云沙箱网关会覆写 Authorization</b>（故平台自家接口一律用 <code>X-Auth-Token</code>）</td></tr>
+      </table>
+      <p class="note">修法：改为<b>自定义头优先 + 候选逐一试配</b>，线上用 <code>X-MCP-Key</code>，<code>Bearer</code> 仅作自建/直连回退；回归脚本请求侧一并改掉（否则"本地绿、线上红"），并补两道防回退断言。<b>通用教训：本地门禁只能覆盖"应用内"行为，覆盖不到宿主对请求本身的改写——凡新引入"靠 HTTP 头传凭据"的通道，必须做一次本地全绿 → 线上实测的对照。</b></p>
+    </div>
+  </section>
+
+  <!-- 信息采集与专家端信息架构（v3.7） -->
+  <section id="collect">
+    <div class="sec-head"><span class="no">14</span><h2>信息采集与专家端信息架构</h2><div class="line"></div></div>
+    <div class="card">
+      <p><b style="color:var(--violet)">v3.7 新增</b>：专家端信息架构三项调整 + 公告运营首位《信息采集》。采集的定位是<b>「给专家递参考」</b>，不是"自动发公告"。</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>专家端信息架构（4 组 / 12 项）</h3>
+        <table>
+          <tr><th>一级组</th><th>二级项</th><th>变化</th></tr>
+          <tr><td>专家服务</td><td>接单与在办 / 课题空间交付 / 撰写中心</td><td>不变</td></tr>
+          <tr><td>公告运营</td><td><b class="warn">信息采集</b>（居首）/ 申报公告发布 / 政策发布</td><td>首位新增</td></tr>
+          <tr><td><b>知识库</b></td><td>资料库 / 模板中心 / 我的资料 / <b class="warn">知识检索</b></td><td>整组新增，位置在公告运营之后；知识检索由《资源与收益》迁入</td></tr>
+          <tr><td>我的业务</td><td>我的任务 / <b class="warn">结算与收益</b></td><td>《资源与收益》组撤销，结算与收益迁入此处</td></tr>
+        </table>
+        <p class="note">四项《知识库》<b>复用用户端既有共享容器</b>（<code>upg-kb|tpl|mydoc|search</code>），<b>不新建专家专属容器</b>——否则同一能力会在两处各自演化，v3.3.1 收口撰写中心时已吃过一次这种亏。</p>
+      </div>
+      <div class="card">
+        <h3>采集三轨（COLLECT_MODE）</h3>
+        <table>
+          <tr><th>轨</th><th>引擎</th><th>当前可用</th></tr>
+          <tr><td><code>seed</code></td><td>rule（内置来源 + 确定性打分）</td><td class="ok">✅ 演示默认，零外网依赖</td></tr>
+          <tr><td><code>remote</code></td><td>remote-agent（外部采集 Agent）</td><td class="warn">⚠️ 未配 <code>COLLECT_AGENT_BASE</code>：选中将 <b class="no">503 显式失败、不回落 seed</b></td></tr>
+          <tr><td><code>fetch</code></td><td>http-fetch（按来源 <code>fetch_url</code> 实时抓取）</td><td class="ok">✅ 受目标站反爬影响，失败如实回报</td></tr>
+        </table>
+        <p class="note">三轨<b>共用同一响应 schema</b>，差异只在 <code>engine</code> / <code>tracks</code> 字段。候选类型 <code>kind</code> ∈ 政策 / 公告 / 课题；当前种子 <b>9 条来源 · 14 条候选</b>。</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>确定性打分 → 三档建议</h3>
+        <table>
+          <tr><th>项</th><th>权重</th></tr>
+          <tr><td>标题命中</td><td>40 / 词</td></tr>
+          <tr><td>标签命中</td><td>24 / 词</td></tr>
+          <tr><td>摘要命中</td><td>12 / 词</td></tr>
+          <tr><td>时效</td><td>≤7 天 +20 ｜ ≤30 天 +12 ｜ ≤60 天 +6</td></tr>
+          <tr><td>来源层级</td><td>国家级 +12 ｜ 省级 +8 ｜ 市级 +4</td></tr>
+        </table>
+        <p class="note"><b>无命中即过滤</b>（返回 <code>None</code>），不做模糊兜底凑页。建议三档：<b class="ok">≥60 建议发布</b> ｜ <b class="warn">≥30 可参考</b> ｜ 否则建议归档。</p>
+      </div>
+      <div class="card">
+        <h3>🔴 采集不是发布通道</h3>
+        <p style="font-size:13px"><code>POST /api/collect/draft</code> <b>只返回草稿、不落库、不发布</b>；发布仍走既有 <code>POST /api/announcements</code> / <code>POST /api/policies</code>，准入（<code>ann.publish</code>）与审计<b>自动复用、权限点零新增</b>。</p>
+        <p class="note">门禁以四类证据把守：<b>公告总数前后不变</b> ／ 分区内无 <code>_ins</code>/<code>_upd(announcement|policy)</code> 字面量 ／ 响应 <code>note</code> 含「未入库」／ 转后条目 <code>status=drafted</code>。</p>
+        <p class="note">F3 如实标注：<code>disclaimer</code> 含「非实时抓取」；<code>seed</code> 轨 <code>refresh.added</code> <b>恒 0</b>——不把内置样例写成「刚采到的」。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>知识检索 vs 资料库 · 分工</h3>
+      <table>
+        <tr><th>维度</th><th>资料库</th><th>知识检索</th></tr>
+        <tr><td>出口</td><td>legacy <code>/api/kb</code></td><td><b>契约出口 <code>/api/kbs/v1/search</code></b></td></tr>
+        <tr><td>职责</td><td>条目浏览 + 自建库管理</td><td>联邦检索 + <b>层级梯度可见化</b></td></tr>
+        <tr><td>界面上能看出什么</td><td>有哪些条目</td><td><b>.ks-depth 徽标</b>直接标出本次结果被裁剪到哪一层（title / summary / teaser / content）</td></tr>
+      </table>
+      <p class="note">把「基础档连 <code>content</code> 键都不存在」这件事做成<b>界面上看得见的徽标</b>，而不是让人去读接口文档——权限设计的可解释性，最终要落在像素上。</p>
+    </div>
+  </section>
+
   <!-- 权限矩阵 -->
   <section id="perm">
-    <div class="sec-head"><span class="no">10</span><h2>知识库权限矩阵</h2><div class="line"></div></div>
+    <div class="sec-head"><span class="no">15</span><h2>知识库权限矩阵</h2><div class="line"></div></div>
     <div class="card">
       <p style="font-size:13px;margin-bottom:12px">检索时先算<b>可见域</b>再查库：从会话取角色 → 计算 visibility 列表（public / premium / expert / internal）→ 前置过滤后返回，命中数与「因可见域被过滤」条数同时返回，便于用户感知。</p>
       <table>
@@ -723,7 +976,7 @@
 
   <!-- 分期路线 -->
   <section id="road">
-    <div class="sec-head"><span class="no">11</span><h2>轻量化分期建设路线</h2><div class="line"></div></div>
+    <div class="sec-head"><span class="no">16</span><h2>轻量化分期建设路线</h2><div class="line"></div></div>
     <!-- 轻量化分阶段建设路线图 -->
     <div class="card" style="padding:18px">
       <h3>轻量化分阶段建设路线图（v2.5）</h3>
@@ -858,7 +1111,7 @@
 
   <!-- 治理与成本 -->
   <section id="ops">
-    <div class="sec-head"><span class="no">12</span><h2>AgentOps 治理与成本</h2><div class="line"></div></div>
+    <div class="sec-head"><span class="no">17</span><h2>AgentOps 治理与成本</h2><div class="line"></div></div>
     <div class="grid2">
       <div class="card">
         <h3>AI 运行成本估算（初期）</h3>
@@ -882,7 +1135,7 @@
 
   <!-- 安全 -->
   <section id="sec">
-    <div class="sec-head"><span class="no">13</span><h2>安全设计</h2><div class="line"></div></div>
+    <div class="sec-head"><span class="no">18</span><h2>安全设计</h2><div class="line"></div></div>
     <div class="grid2">
       <div class="card">
         <h3>AI 三重失控应对</h3>
@@ -899,7 +1152,7 @@
   </section>
 
   <footer>
-    <p class="v">课题智慧坊-AI智能平台架构设计方案 · v3.3.2</p>
+    <p class="v">课题智慧坊-AI智能平台架构设计方案 · v3.7</p>
     <p>全栈开源技术构建 ｜ 训练算力按需云租用、推理算力自建 ｜ 所有AI产出强制人工评审兜底</p>
     <p style="margin-top:6px">本页为方案演示版，完整技术细节以 Markdown 方案文档为准</p>
   </footer>
