@@ -256,7 +256,7 @@
         <tr><td>模型档位</td><td>9B 小档位 + 缓存优先</td><td>27B+ 大档位 / 商用 API 智能路由</td></tr>
         <tr><td>上下文窗口</td><td>8K tokens</td><td>128K tokens（长文档整篇直入）</td></tr>
         <tr><td>长文档解析</td><td>不支持（&gt;20 页需拆分）</td><td>PDF / Word 整篇 + 大文档分级加载</td></tr>
-        <tr><td>AI 审核</td><td>仅错别字 / 标点</td><td>七项全量（敏感词三级 / 口语化 / 去 AI 化…）</td></tr>
+        <tr><td>AI 审核</td><td>仅错别字 / 标点</td><td>七项全量（敏感词三级 / 口语化 / 学术语体规范化…）</td></tr>
         <tr><td>深度研究 Agent</td><td>不可用</td><td>多轮检索 + 交叉验证 + 引用溯源</td></tr>
         <tr><td>私有知识空间</td><td>不可用</td><td>可建 10 个私有库</td></tr>
         <tr><td>MCP 对外输出</td><td>不可用</td><td>授权后供第三方 Agent 调用</td></tr>
@@ -677,7 +677,7 @@
       <p style="font-size:13px;margin-bottom:10px">左栏（稿件/模板库）· 中栏（五阶段流水线 + 章节编辑）· 右栏（AI 面板：AI 撰写辅助 / AI 审计 / 专家支持）＝把 5.7 模板审核 与 5.8 五阶段流水线 收进用户侧统一操作台。</p>
       <table>
         <tr><th>流水线五阶段</th><th>右栏 AI 撰写辅助（五动作）</th><th>AI 审计七项</th></tr>
-        <tr><td>① 课题准备 → ② 文献调研 → ③ 方案制定 → ④ 大纲规划 → ⑤ 正文写作</td><td>outline 大纲 / chapter 本章骨架 / condense 精炼 / depersonalize 活页匿名 / deoral 口语化</td><td>①敏感词 ②错别字 ③口语化 ④优化建议 ⑤字数 ⑥预期字数 ⑦去AI化</td></tr>
+        <tr><td>① 课题准备 → ② 文献调研 → ③ 方案制定 → ④ 大纲规划 → ⑤ 正文写作</td><td>outline 大纲 / chapter 本章骨架 / condense 精炼 / depersonalize 活页匿名 / deoral 口语化</td><td>①敏感词 ②错别字 ③口语化 ④优化建议 ⑤字数 ⑥预期字数 ⑦学术语体规范化</td></tr>
       </table>
       <p class="note">三条硬边界：AI 不交付终稿（标注「需人工补实」）· 不静默改写正文（两段确认写回）· 大纲不直接覆盖正文。字数口径全平台统一（中文字+英文词+数字串）。</p>
     </div>
@@ -707,7 +707,7 @@
 
   <!-- 权限矩阵 -->
   <section id="perm">
-    <div class="sec-head"><span class="no">08</span><h2>知识库权限矩阵</h2><div class="line"></div></div>
+    <div class="sec-head"><span class="no">10</span><h2>知识库权限矩阵</h2><div class="line"></div></div>
     <div class="card">
       <p style="font-size:13px;margin-bottom:12px">检索时先算<b>可见域</b>再查库：从会话取角色 → 计算 visibility 列表（public / premium / expert / internal）→ 前置过滤后返回，命中数与「因可见域被过滤」条数同时返回，便于用户感知。</p>
       <table>
@@ -858,7 +858,7 @@
 
   <!-- 治理与成本 -->
   <section id="ops">
-    <div class="sec-head"><span class="no">10</span><h2>AgentOps 治理与成本</h2><div class="line"></div></div>
+    <div class="sec-head"><span class="no">12</span><h2>AgentOps 治理与成本</h2><div class="line"></div></div>
     <div class="grid2">
       <div class="card">
         <h3>AI 运行成本估算（初期）</h3>
@@ -882,7 +882,7 @@
 
   <!-- 安全 -->
   <section id="sec">
-    <div class="sec-head"><span class="no">11</span><h2>安全设计</h2><div class="line"></div></div>
+    <div class="sec-head"><span class="no">13</span><h2>安全设计</h2><div class="line"></div></div>
     <div class="grid2">
       <div class="card">
         <h3>AI 三重失控应对</h3>
@@ -899,7 +899,7 @@
   </section>
 
   <footer>
-    <p class="v">课题智慧坊-AI智能平台架构设计方案 · v3.0</p>
+    <p class="v">课题智慧坊-AI智能平台架构设计方案 · v3.3.2</p>
     <p>全栈开源技术构建 ｜ 训练算力按需云租用、推理算力自建 ｜ 所有AI产出强制人工评审兜底</p>
     <p style="margin-top:6px">本页为方案演示版，完整技术细节以 Markdown 方案文档为准</p>
   </footer>
