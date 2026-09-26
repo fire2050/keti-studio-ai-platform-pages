@@ -898,4 +898,67 @@
   </section>
 
   <!-- 信息采集与专家端信息架构（v3.7） -->
-<!-- STAGED 3/4 -->
+  <section id="collect">
+    <div class="sec-head"><span class="no">14</span><h2>信息采集与专家端信息架构</h2><div class="line"></div></div>
+    <div class="card">
+      <p><b style="color:var(--violet)">v3.7 新增</b>：专家端信息架构三项调整 + 公告运营首位《信息采集》。采集的定位是<b>「给专家递参考」</b>，不是"自动发公告"。</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>专家端信息架构（4 组 / 12 项）</h3>
+        <table>
+          <tr><th>一级组</th><th>二级项</th><th>变化</th></tr>
+          <tr><td>专家服务</td><td>接单与在办 / 课题空间交付 / 撰写中心</td><td>不变</td></tr>
+          <tr><td>公告运营</td><td><b class="warn">信息采集</b>（居首）/ 申报公告发布 / 政策发布</td><td>首位新增</td></tr>
+          <tr><td><b>知识库</b></td><td>资料库 / 模板中心 / 我的资料 / <b class="warn">知识检索</b></td><td>整组新增，位置在公告运营之后；知识检索由《资源与收益》迁入</td></tr>
+          <tr><td>我的业务</td><td>我的任务 / <b class="warn">结算与收益</b></td><td>《资源与收益》组撤销，结算与收益迁入此处</td></tr>
+        </table>
+        <p class="note">四项《知识库》<b>复用用户端既有共享容器</b>（<code>upg-kb|tpl|mydoc|search</code>），<b>不新建专家专属容器</b>——否则同一能力会在两处各自演化，v3.3.1 收口撰写中心时已吃过一次这种亏。</p>
+      </div>
+      <div class="card">
+        <h3>采集三轨（COLLECT_MODE）</h3>
+        <table>
+          <tr><th>轨</th><th>引擎</th><th>当前可用</th></tr>
+          <tr><td><code>seed</code></td><td>rule（内置来源 + 确定性打分）</td><td class="ok">✅ 演示默认，零外网依赖</td></tr>
+          <tr><td><code>remote</code></td><td>remote-agent（外部采集 Agent）</td><td class="warn">⚠️ 未配 <code>COLLECT_AGENT_BASE</code>：选中将 <b class="no">503 显式失败、不回落 seed</b></td></tr>
+          <tr><td><code>fetch</code></td><td>http-fetch（按来源 <code>fetch_url</code> 实时抓取）</td><td class="ok">✅ 受目标站反爬影响，失败如实回报</td></tr>
+        </table>
+        <p class="note">三轨<b>共用同一响应 schema</b>，差异只在 <code>engine</code> / <code>tracks</code> 字段。候选类型 <code>kind</code> ∈ 政策 / 公告 / 课题；当前种子 <b>9 条来源 · 14 条候选</b>。</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>确定性打分 → 三档建议</h3>
+        <table>
+          <tr><th>项</th><th>权重</th></tr>
+          <tr><td>标题命中</td><td>40 / 词</td></tr>
+          <tr><td>标签命中</td><td>24 / 词</td></tr>
+          <tr><td>摘要命中</td><td>12 / 词</td></tr>
+          <tr><td>时效</td><td>≤7 天 +20 ｜ ≤30 天 +12 ｜ ≤60 天 +6</td></tr>
+          <tr><td>来源层级</td><td>国家级 +12 ｜ 省级 +8 ｜ 市级 +4</td></tr>
+        </table>
+        <p class="note"><b>无命中即过滤</b>（返回 <code>None</code>），不做模糊兜底凑页。建议三档：<b class="ok">≥60 建议发布</b> ｜ <b class="warn">≥30 可参考</b> ｜ 否则建议归档。</p>
+      </div>
+      <div class="card">
+        <h3>🔴 采集不是发布通道</h3>
+        <p style="font-size:13px"><code>POST /api/collect/draft</code> <b>只返回草稿、不落库、不发布</b>；发布仍走既有 <code>POST /api/announcements</code> / <code>POST /api/policies</code>，准入（<code>ann.publish</code>）与审计<b>自动复用、权限点零新增</b>。</p>
+        <p class="note">门禁以四类证据把守：<b>公告总数前后不变</b> ／ 分区内无 <code>_ins</code>/<code>_upd(announcement|policy)</code> 字面量 ／ 响应 <code>note</code> 含「未入库」／ 转后条目 <code>status=drafted</code>。</p>
+        <p class="note">F3 如实标注：<code>disclaimer</code> 含「非实时抓取」；<code>seed</code> 轨 <code>refresh.added</code> <b>恒 0</b>——不把内置样例写成「刚采到的」。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>知识检索 vs 资料库 · 分工</h3>
+      <table>
+        <tr><th>维度</th><th>资料库</th><th>知识检索</th></tr>
+        <tr><td>出口</td><td>legacy <code>/api/kb</code></td><td><b>契约出口 <code>/api/kbs/v1/search</code></b></td></tr>
+        <tr><td>职责</td><td>条目浏览 + 自建库管理</td><td>联邦检索 + <b>层级梯度可见化</b></td></tr>
+        <tr><td>界面上能看出什么</td><td>有哪些条目</td><td><b>.ks-depth 徽标</b>直接标出本次结果被裁剪到哪一层（title / summary / teaser / content）</td></tr>
+      </table>
+      <p class="note">把「基础档连 <code>content</code> 键都不存在」这件事做成<b>界面上看得见的徽标</b>，而不是让人去读接口文档——权限设计的可解释性，最终要落在像素上。</p>
+    </div>
+  </section>
+
+  <!-- 权限矩阵 -->
+  <section id="perm">
+    <div class="sec-head"><span class="no">15</span><h2>知识库权限矩阵</h2><div class="line"></div></div>
+    <div class="card
