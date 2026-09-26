@@ -298,4 +298,304 @@
         <tr><td>长文档解析</td><td>不支持（&gt;20 页需拆分）</td><td>PDF / Word 整篇 + 大文档分级加载</td></tr>
         <tr><td>AI 审核</td><td>仅错别字 / 标点</td><td>七项全量（敏感词三级 / 口语化 / 学术语体规范化…）</td></tr>
         <tr><td>深度研究 Agent</td><td>不可用</td><td>多轮检索 + 交叉验证 + 引用溯源</td></tr>
-<!-- STAGED 1/4 -->
+        <tr><td>私有知识空间</td><td>不可用</td><td>可建 10 个私有库</td></tr>
+        <tr><td>MCP 对外输出</td><td>不可用</td><td>可用（授权 API key）：只读 4 工具，按 key 预置可见域裁剪</td></tr>
+        <tr><td>算力队列</td><td>共享队列（高峰排队）</td><td>优先队列（旺季不降级）</td></tr>
+        <tr><td>月度额度</td><td>问答 100 次 / 写作 20 篇</td><td>问答 3,000 次 / 写作 200 篇</td></tr>
+        <tr><td>服务等级</td><td>社区互助 · 工作日 24h</td><td>4h 响应 · SLA 99% · 专属服务群</td></tr>
+      </table>
+      <p class="note">额度耗尽 = 降级到小档位模型，<b>不硬拦</b>；升级后即时恢复。</p>
+    </div>
+    <div class="card">
+      <h3>数据库规划：本地为主 · Supabase 跑通 demo</h3>
+      <table>
+        <tr><th>项</th><th>选型</th><th>说明</th></tr>
+        <tr><td>生产主库</td><td><b>本地 PostgreSQL 16</b></td><td>五维论证：数据出境合规、客户合同约束、资产主权、检索延迟、长期成本</td></tr>
+        <tr><td>演进路线</td><td>容器起步 → 主从 + PITR → 读写分离</td><td>目标 RPO ≤15min、RTO ≤1h</td></tr>
+        <tr><td>demo 形态</td><td>Supabase</td><td>RLS 必开；service_role 不下发前端；Storage 私有 + 签名 URL</td></tr>
+        <tr><td>切换策略</td><td>迁移脚本为唯一真源 + 数据源适配层</td><td>含 12 项切换验收清单（向量召回重合率 ≥95%、7 天回滚窗口）</td></tr>
+        <tr><td>禁止事项</td><td>SQLite 仅作本地 Worker 队列</td><td>不得作为主库使用</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- Agent平台 -->
+  <section id="agent">
+    <div class="sec-head"><span class="no">03</span><h2>智能体 Agent 平台</h2><div class="line"></div></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>协议底座（2026标准格局）</h3>
+        <p><b style="color:var(--cyan)">MCP</b>：Agent↔工具/数据垂直集成，无状态HTTP架构，月下载1.1亿+；<b style="color:var(--violet)">A2A</b>：Agent↔Agent水平协作，v1.0规范，150+组织生产部署。两大协议2026-08同归AAIF统一治理，选型风险消除。</p>
+        <p style="margin-top:8px"><span class="pill cyan">MCP 管工具</span><span class="pill vio">A2A 管协作</span><span class="pill grn">能力即资产</span><span class="pill amb">不建上帝Agent</span></p>
+      </div>
+      <div class="card">
+        <h3>运行时选型</h3>
+        <p><b style="color:var(--cyan)">Spring AI 2.0</b>（Java主栈，与Spring Boot无缝集成）｜ <b style="color:var(--violet)">LangGraph 1.2</b>（Python复杂有状态工作流，断点恢复）｜ <b style="color:var(--pink)">Dify</b>（低代码运营）。AutoGen已进入维护模式，明确不采用。</p>
+      </div>
+    </div>
+    <div class="grid3">
+      <div class="agent"><div class="name">科研Agent</div><div class="role">课题选题推荐、进度管理、结题材料准备</div><div class="tools"><i>PM MCP</i><i>RAG MCP</i></div></div>
+      <div class="agent"><div class="name">申报Agent</div><div class="role">资质诊断评估、匹配度打分、申报排期</div><div class="tools"><i>CRM MCP</i><i>POLICY MCP</i><i>RAG MCP</i></div></div>
+      <div class="agent"><div class="name">知产Agent</div><div class="role">商标近似检索、侵权风险评估、年费提醒</div><div class="tools"><i>RAG MCP</i><i>PM MCP</i></div></div>
+      <div class="agent"><div class="name">政策Agent</div><div class="role">政策爬取解析、企业画像匹配、订阅推送</div><div class="tools"><i>POLICY MCP</i><i>CRM MCP</i></div></div>
+      <div class="agent"><div class="name">文档Agent</div><div class="role">申请书/申报书模板化生成、润色查重</div><div class="tools"><i>DOC MCP</i><i>RAG MCP</i></div></div>
+      <div class="card" style="margin:0">
+        <h3>治理机制</h3>
+        <p style="font-size:12.5px">A2A容错：Resilience4j超时/熔断/降级/重试；上下文传递规范（委派≤500/查询≤100/协作≤1,000 tokens）；能力卡片 GET /capabilities 自动发现；MCP工具版本管理与Pact契约测试。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 模型训练 -->
+  <section id="model">
+    <div class="sec-head"><span class="no">04</span><h2>模型训练与微调体系</h2><div class="line"></div></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>三层能力金字塔</h3>
+        <p><b style="color:var(--green)">L1 零训练</b>：基座+Prompt+AgenticRAG，覆盖80%通用场景</p>
+        <p><b style="color:var(--cyan)">L2 轻训练</b>：LoRA/QLoRA微调，专业场景准确率提升</p>
+        <p><b style="color:var(--violet)">L3 持续闭环</b>：业务数据回流+周期性再训练，构建壁垒</p>
+        <p class="note">先RAG后微调——RAG解决时效与溯源，微调解决文风/格式/领域推理，两者结合而非互斥。</p>
+      </div>
+      <div class="card">
+        <h3>SFT 数据 P0/P1 分级</h3>
+        <table>
+          <tr><th>级别</th><th>场景</th><th>构建方式</th><th>目标</th><th>质量</th></tr>
+          <tr><td><b style="color:var(--violet)">P0</b></td><td>完整申请书写作、政策匹配推理</td><td>专家纯手工精标</td><td>2,000对</td><td>互审100%</td></tr>
+          <tr><td><b style="color:var(--cyan)">P1</b></td><td>润色/格式/摘要辅助场景</td><td>Agent初稿+修订差分</td><td>8,000对</td><td>抽检≥90%</td></tr>
+        </table>
+        <p class="note">微调触发条件：P0≥1,500对 且 RAG评测集≥500条 且 专家确认核心场景覆盖完整。人力：P0需2名专家全职6-7个月，建议阶段1提前启动。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>训练流水线与基座模型</h3>
+      <p style="font-size:12.5px;margin-bottom:10px">
+        <span class="pill cyan">LLaMA-Factory</span><span class="pill vio">MLflow实验跟踪</span><span class="pill grn">RAGAs评测门禁</span>
+        <span class="pill amb">模型注册model_registry</span><span class="pill cyan">vLLM灰度发布</span><span class="pill grn">一键回滚&lt;10min</span>
+      </p>
+      <table>
+        <tr><th>用途</th><th>模型</th><th>规格</th><th>协议</th></tr>
+        <tr><td>主力推理（生产）</td><td>Qwen3.5</td><td>9B / 27B / 122B（多模态+工具调用+思考）</td><td>Apache 2.0</td></tr>
+        <tr><td>高性价比长文档</td><td>DeepSeek V4 Flash</td><td>284B MoE（激活13B），1M上下文</td><td>MIT</td></tr>
+        <tr><td>Embedding</td><td>bge-m3</td><td>稠密+稀疏双输出，混合检索</td><td>MIT</td></tr>
+        <tr><td>Reranker</td><td>bge-reranker-v2-m3</td><td>重排序</td><td>Apache 2.0</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 技术栈 -->
+  <section id="stack">
+    <div class="sec-head"><span class="no">05</span><h2>开源技术栈选型</h2><div class="line"></div></div>
+    <div class="grid3">
+      <div class="card"><h3>前端</h3><p>Vue 3 + Vite + Element Plus + Pinia + ECharts + Vant(H5)</p></div>
+      <div class="card"><h3>后端</h3><p>Spring Boot 3 + Spring Cloud + MyBatis-Plus + Spring Security + Flowable 7</p></div>
+      <div class="card"><h3>Agent</h3><p>Spring AI 2.0 + LangGraph 1.2 + Dify + MCP/A2A 双协议</p></div>
+      <div class="card"><h3>模型推理</h3><p>vLLM(生产) + Ollama(开发) + Qwen3.5 + DeepSeek V4 Flash</p></div>
+      <div class="card"><h3>数据层</h3><p>本地 PostgreSQL 16（主库）+ Redis 7 + OpenSearch 2 + MinIO + Milvus 2.4；demo 阶段用 Supabase 跑通流程（RLS 必开）</p></div>
+      <div class="card"><h3>文档与运维</h3><p>OnlyOffice CE + Apache POI + Docker/K8s + GitLab CE + Prometheus/Grafana</p></div>
+    </div>
+    <div class="card">
+      <h3>关键合规决策</h3>
+      <p style="font-size:13px"><b style="color:var(--green)">OpenSearch</b> 替代 Elasticsearch 规避 SSPL 协议风险 ｜ <b style="color:var(--green)">Qwen3.5/DeepSeek</b> 宽松许可可商用可微调 ｜ <b style="color:var(--amber)">MinIO / OnlyOffice CE</b>（AGPL）不修改源码则自用合规 ｜ <b style="color:var(--amber)">Dify</b> 多租户对外SaaS需注意。</p>
+    </div>
+  </section>
+
+  <!-- MCP输出 -->
+  <section id="mcp">
+    <div class="sec-head"><span class="no">06</span><h2>知识库与文档撰写 · MCP 输出</h2><div class="line"></div></div>
+    <!-- 知识库与文档撰写 MCP 对接架构图 -->
+    <div class="card" style="padding:18px">
+      <h3>知识库与文档撰写 MCP 对接架构图（v2.5）</h3>
+      <p class="note" style="margin-bottom:12px">能力跟随用户客户端：顾问在千问办公 / WorkBuddy 对话中直接调用公司知识库与文档撰写能力，无需登录新系统；rag-server 阶段0末上线（只读先行），doc-server 阶段1末上线（读写·守门）。</p>
+      <svg viewBox="0 0 680 320" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg" font-family="'宋体',SimSun,serif">
+        <defs>
+          <linearGradient id="mcpGc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+          <linearGradient id="mcpGg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#818cf8"/></linearGradient>
+          <linearGradient id="mcpGv" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#c084fc"/></linearGradient>
+          <linearGradient id="mcpGg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#2dd4bf"/></linearGradient>
+          <marker id="mcpArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#5b6c8c"/>
+          </marker>
+        </defs>
+        <rect x="0" y="0" width="680" height="320" rx="12" fill="#0b1120" stroke="rgba(96,165,250,.2)"/>
+        <!-- 列标题 -->
+        <text x="79" y="26" text-anchor="middle" fill="#8fa3c4" font-size="10.5" letter-spacing="1">外部 Agent 客户端</text>
+        <text x="284" y="26" text-anchor="middle" fill="#8fa3c4" font-size="10.5" letter-spacing="1">接入网关（固定域名）</text>
+        <text x="479" y="26" text-anchor="middle" fill="#8fa3c4" font-size="10.5" letter-spacing="1">MCP 工具服务器</text>
+        <!-- 客户端 -->
+        <rect x="12" y="40" width="135" height="34" rx="7" fill="#0e1628" stroke="rgba(34,211,238,.35)"/>
+        <text x="79" y="61" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="bold">千问办公</text>
+        <rect x="12" y="82" width="135" height="34" rx="7" fill="#0e1628" stroke="rgba(34,211,238,.35)"/>
+        <text x="79" y="103" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="bold">WorkBuddy</text>
+        <rect x="12" y="124" width="135" height="34" rx="7" fill="#0e1628" stroke="rgba(34,211,238,.35)"/>
+        <text x="79" y="145" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="bold">自建 Agent</text>
+        <!-- 网关 -->
+        <rect x="210" y="66" width="148" height="76" rx="9" fill="#0e1628" stroke="rgba(96,165,250,.5)"/>
+        <rect x="210" y="66" width="148" height="3" fill="url(#mcpGg)"/>
+        <text x="284" y="88" text-anchor="middle" fill="#60a5fa" font-size="12" font-weight="bold">APISIX / Nginx</text>
+        <text x="284" y="106" text-anchor="middle" fill="#8fa3c4" font-size="9.5">固定域名 + HTTPS 反代</text>
+        <text x="284" y="121" text-anchor="middle" fill="#8fa3c4" font-size="9.5">独立 Key 配额（60次/分）</text>
+        <text x="284" y="136" text-anchor="middle" fill="#8fa3c4" font-size="9.5">用量仪表盘 / 审计日志</text>
+        <!-- servers -->
+        <rect x="404" y="40" width="150" height="58" rx="8" fill="#0e1628" stroke="rgba(167,139,250,.5)"/>
+        <rect x="404" y="40" width="150" height="3" fill="url(#mcpGv)"/>
+        <text x="479" y="61" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="bold">rag-server（只读）</text>
+        <text x="479" y="77" text-anchor="middle" fill="#8fa3c4" font-size="8.5">search_knowledge · retrieve_policy · search_template</text>
+        <text x="479" y="91" text-anchor="middle" fill="#5b6c8c" font-size="8.5">domain 分域过滤 · 强制来源引用</text>
+        <rect x="404" y="106" width="150" height="58" rx="8" fill="#0e1628" stroke="rgba(244,114,182,.5)"/>
+        <rect x="404" y="106" width="150" height="3" fill="#f472b6"/>
+        <text x="479" y="127" text-anchor="middle" fill="#f472b6" font-size="11" font-weight="bold">doc-server（读写）</text>
+        <text x="479" y="143" text-anchor="middle" fill="#8fa3c4" font-size="8.5">get_session_token · generate_document · optimize_text</text>
+        <text x="479" y="157" text-anchor="middle" fill="#5b6c8c" font-size="8.5">session_token 守门 · AI初稿水印</text>
+        <!-- 共享底座 -->
+        <rect x="12" y="248" width="656" height="52" rx="9" fill="#0e1628" stroke="rgba(52,211,153,.5)"/>
+        <rect x="12" y="248" width="656" height="3" fill="url(#mcpGg2)"/>
+        <text x="340" y="270" text-anchor="middle" fill="#34d399" font-size="12" font-weight="bold" letter-spacing="1">共享 RAG 底座（一套知识库 · 一套检索逻辑）</text>
+        <text x="340" y="289" text-anchor="middle" fill="#8fa3c4" font-size="9.5">pgvector + bge-m3 混合检索 ｜ MinIO 文档存储 ｜ vLLM 推理（Qwen3.5 / DeepSeek V4 Flash）</text>
+        <!-- 箭头：客户端→网关 -->
+        <line x1="147" y1="57" x2="207" y2="72" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <line x1="147" y1="99" x2="207" y2="99" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <line x1="147" y1="141" x2="207" y2="126" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <!-- 箭头：网关→servers -->
+        <line x1="358" y1="85" x2="402" y2="76" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <line x1="358" y1="111" x2="402" y2="126" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <!-- 箭头：servers→底座 -->
+        <line x1="479" y1="164" x2="479" y2="245" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#mcpArr)"/>
+        <!-- 防双轨漂移门禁 -->
+        <rect x="404" y="172" width="264" height="44" rx="7" fill="rgba(251,191,36,.05)" stroke="rgba(251,191,36,.25)"/>
+        <text x="536" y="190" text-anchor="middle" fill="#fbbf24" font-size="9.5" font-weight="bold">防双轨漂移门禁</text>
+        <text x="536" y="205" text-anchor="middle" fill="#8fa3c4" font-size="8.5">共享检索核心 · A/B对比50题差异率&lt;5%</text>
+        <!-- 底部安全注记 -->
+        <text x="340" y="314" text-anchor="middle" fill="#5b6c8c" font-size="9">每客户端独立 Key+配额 ｜ 生产禁用临时隧道 ｜ 客户档案与案例永不出内网</text>
+      </svg>
+    </div>
+    <div class="card">
+      <h3>对接架构：能力跟随用户客户端</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:12.5px;margin-bottom:14px">
+        <span class="pill cyan">千问办公</span><span class="pill vio">WorkBuddy</span><span class="pill grn">自建Agent</span>
+        <span style="color:var(--dim)">→</span>
+        <span class="pill amb">APISIX / Nginx (固定域名HTTPS)</span>
+        <span style="color:var(--dim)">→</span>
+        <span class="pill cyan">rag-server（只读）</span><span class="pill vio">doc-server（读写·session_token守门）</span>
+        <span style="color:var(--dim)">→</span>
+        <span class="pill grn">共享RAG底座：pgvector + bge-m3 + MinIO + vLLM</span>
+      </div>
+      <table>
+        <tr><th>Server</th><th>核心工具</th><th>安全策略</th></tr>
+        <tr><td><b style="color:var(--cyan)">rag-server</b>（阶段0末上线）</td><td>search_knowledge / retrieve_policy / search_template</td><td>domain分域权限强制过滤 + 脱敏层 + 强制来源引用</td></tr>
+        <tr><td><b style="color:var(--violet)">doc-server</b>（阶段1末上线）</td><td>get_session_token / generate_document / optimize_text / check_similarity</td><td>两段式鉴权 + "AI初稿"水印 + 审计日志</td></tr>
+      </table>
+      <p class="note">每客户端独立API key+独立配额（60次/分基线）；生产固定域名+HTTPS反代，临时隧道仅限联调；共享检索核心实现，A/B对比差异率&lt;5%门禁防双轨漂移。</p>
+    </div>
+  </section>
+
+  <!-- 统一知识平台（v2.6） -->
+  <section id="ukp">
+    <div class="sec-head"><span class="no">07</span><h2>统一知识平台 · 多源知识联邦</h2><div class="line"></div></div>
+    <div class="card">
+      <h3>为什么需要统一知识平台</h3>
+      <p>企业知识天然分散在四类平台：自建AI知识库（政策 / 模板 / 成果等核心资产）、ima 知识库（个人与团队资料沉淀、文章素材）、钉钉文档（内部协同与制度流程）、腾讯文档（对客交付物与跨组织协同）。顾问回答一个问题需跨平台翻找，而 AI 只覆盖其中一部分——<b style="color:var(--amber)">知识资产越多，查找成本越高</b>。</p>
+      <table>
+        <tr><th>原则</th><th>含义</th><th>反模式（禁止）</th></tr>
+        <tr><td><b style="color:var(--cyan)">① 不搬迁，只连接</b></td><td>各平台保留为员工原有的使用与协作现场，平台只做连接与索引</td><td>强制全员把文档搬到自建库——协作现场丢失、推行阻力极大</td></tr>
+        <tr><td><b style="color:var(--cyan)">② 统一入口，单一答案</b></td><td>上层只面对一个检索接口，多源结果融合去重后统一呈现</td><td>四个平台四个答案，顾问需自行判断信哪个</td></tr>
+        <tr><td><b style="color:var(--cyan)">③ 产出即沉淀</b></td><td>文档 / 文章定稿后自动回流为可检索知识，形成正循环</td><td>写完即弃，同类问题反复从零撰写</td></tr>
+      </table>
+      <p class="note">主次定位：自建AI知识库为<b>主库（Source of Truth）与索引中枢</b>——负责统一索引、融合排序、权限收敛与对外 MCP 输出；ima / 钉钉 / 腾讯文档为<b>协作现场与增量来源</b>。任一外部平台不可用时，核心知识资产与检索能力不受影响。</p>
+    </div>
+    <div class="card">
+      <h3>四类知识源能力矩阵（2026-09 实测口径）</h3>
+      <table>
+        <tr><th>知识源</th><th>业务定位</th><th>检索能力</th><th>写入能力</th><th>权限粒度</th><th>关键约束</th></tr>
+        <tr><td><b style="color:var(--green)">① 自建AI知识库</b><br><span style="color:var(--dim);font-size:11px">Dify + pgvector/Milvus + MinIO</span></td><td>主库：政策库 / 模板库 / 成果库 / 方法论</td><td>向量+全文混合检索、bge-reranker 重排，完全可控</td><td>完全可控，支持结构化字段与质量分</td><td>角色×分域矩阵，检索前置过滤</td><td>需自建运维；冷启动需录入人力</td></tr>
+        <tr><td><b style="color:var(--cyan)">② ima 知识库</b></td><td>个人与团队资料沉淀、文章素材、网页剪藏</td><td>search_knowledge / search_knowledge_base API</td><td>add_knowledge（文件/网页入库）、import_urls 批量</td><td>知识库级</td><td>单文件上限：TXT/MD/Excel 10MB、图片30MB、PDF/Word/PPT 200MB</td></tr>
+        <tr><td><b style="color:var(--violet)">③ 钉钉文档知识库</b></td><td>企业内部协同文档、制度与流程知识</td><td>知识库节点树遍历；<b style="color:var(--amber)">无原生语义检索</b>，需由统一平台补齐</td><td>创建文档、目录管理、权限成员管理</td><td>知识库级 / 文件夹级 / 单文档级三层继承</td><td>文档导出（markdown）为定向开放能力，需申请开通</td></tr>
+        <tr><td><b style="color:var(--amber)">④ 腾讯文档</b></td><td>对客交付物、跨组织协同、表格类数据</td><td>关键字搜索 <span style="color:var(--dim)">GET /openapi/drive/v2/search</span></td><td>新建 / 导入 / 导出 / 编辑 / 权限 / 协作成员全能力</td><td>文档级 + 协作成员；新文档默认私有</td><td>API 免费额度按应用计数，需监控；同名文件可重复，需显式去重</td></tr>
+      </table>
+      <p class="note">能力结论：四类源中自建库完全可控；ima 与腾讯文档具备<b>原生读写 + 检索</b>；钉钉文档具备<b>结构化遍历 + 读取</b>，语义检索必须由统一平台补齐。因此统一平台必须同时支持「镜像入库」与「检索代理」两种形态。</p>
+    </div>
+    <!-- 统一知识平台架构图 -->
+    <div class="card" style="padding:18px">
+      <h3>统一知识平台架构图（v2.6）</h3>
+      <p class="note" style="margin-bottom:12px">自上而下六层：应用 → 融合 → 索引 → 接入（适配器隔离第三方差异）→ 同步 → 沉淀。上层只见一个检索接口，底层差异全部由适配器吸收。</p>
+      <svg viewBox="0 0 680 472" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg" font-family="'宋体',SimSun,serif">
+        <defs>
+          <linearGradient id="ukGc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+          <linearGradient id="ukGv" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#c084fc"/></linearGradient>
+          <linearGradient id="ukGg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#2dd4bf"/></linearGradient>
+          <linearGradient id="ukGa" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#f59e0b"/></linearGradient>
+          <linearGradient id="ukGp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f472b6"/><stop offset="1" stop-color="#fb7185"/></linearGradient>
+          <marker id="ukArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#5b6c8c"/></marker>
+        </defs>
+        <rect x="0" y="0" width="680" height="472" rx="12" fill="#0b1120" stroke="rgba(96,165,250,.2)"/>
+        <!-- 应用层 -->
+        <rect x="12" y="30" width="656" height="46" rx="9" fill="#0e1628" stroke="rgba(34,211,238,.35)"/>
+        <text x="26" y="58" fill="#22d3ee" font-size="11" font-weight="bold">应用层</text>
+        <rect x="88" y="39" width="180" height="28" rx="6" fill="#0e1628" stroke="rgba(34,211,238,.4)"/>
+        <text x="178" y="57" text-anchor="middle" fill="#22d3ee" font-size="10.5">问答 Agent（跨源编排）</text>
+        <rect x="278" y="39" width="150" height="28" rx="6" fill="#0e1628" stroke="rgba(34,211,238,.4)"/>
+        <text x="353" y="57" text-anchor="middle" fill="#22d3ee" font-size="10.5">文档撰写 Agent</text>
+        <rect x="438" y="39" width="152" height="28" rx="6" fill="#0e1628" stroke="rgba(34,211,238,.4)"/>
+        <text x="514" y="57" text-anchor="middle" fill="#22d3ee" font-size="10.5">MCP 对外输出</text>
+        <rect x="600" y="39" width="56" height="28" rx="6" fill="#0e1628" stroke="rgba(34,211,238,.4)"/>
+        <text x="628" y="57" text-anchor="middle" fill="#22d3ee" font-size="10.5">前端</text>
+        <line x1="340" y1="76" x2="340" y2="92" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 融合层 -->
+        <rect x="12" y="94" width="656" height="58" rx="9" fill="#0e1628" stroke="rgba(167,139,250,.5)"/>
+        <rect x="12" y="94" width="656" height="3" fill="url(#ukGv)"/>
+        <text x="26" y="116" fill="#a78bfa" font-size="11" font-weight="bold">融合层</text>
+        <text x="340" y="116" text-anchor="middle" fill="#c084fc" font-size="11.5" font-weight="bold">联邦检索：并行检索四源 → 分数归一化 → RRF / bge-reranker 重排 → 权限前置过滤 → SimHash 去重</text>
+        <text x="340" y="136" text-anchor="middle" fill="#8fa3c4" font-size="9.5">源路由 Router │ 引用溯源（来源徽标 + 更新时间 + 原文链接）│ 降级熔断 │ 问答缓存</text>
+        <line x1="340" y1="152" x2="340" y2="168" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 索引层 -->
+        <rect x="12" y="170" width="656" height="58" rx="9" fill="#0e1628" stroke="rgba(52,211,153,.5)"/>
+        <rect x="12" y="170" width="656" height="3" fill="url(#ukGg)"/>
+        <text x="26" y="192" fill="#34d399" font-size="11" font-weight="bold">索引层</text>
+        <text x="340" y="192" text-anchor="middle" fill="#2dd4bf" font-size="11.5" font-weight="bold">统一元数据注册表 + 向量 / 全文索引（自建主库承载）</text>
+        <text x="340" y="212" text-anchor="middle" fill="#8fa3c4" font-size="9.5">CanonicalDoc 统一模型（source / acl / content_hash / quality_score / origin_url）· 跨源去重 · 质量分排序加权</text>
+        <line x1="340" y1="228" x2="340" y2="244" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 接入层 -->
+        <rect x="12" y="246" width="656" height="88" rx="9" fill="#0e1628" stroke="rgba(96,165,250,.5)"/>
+        <rect x="12" y="246" width="656" height="3" fill="url(#ukGc)"/>
+        <text x="26" y="268" fill="#60a5fa" font-size="11" font-weight="bold">接入层</text>
+        <text x="340" y="268" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="bold">Knowledge Connector 适配器（统一接口，隔离第三方差异）</text>
+        <text x="340" y="283" text-anchor="middle" fill="#5b6c8c" font-size="9">每个适配器实现：list(cursor) / fetch(ref) / search(query) / write_back(doc) / watch(cb)</text>
+        <rect x="24" y="292" width="150" height="32" rx="7" fill="#0e1628" stroke="rgba(52,211,153,.45)"/>
+        <text x="99" y="312" text-anchor="middle" fill="#34d399" font-size="10.5">① 自建适配器（原生）</text>
+        <rect x="186" y="292" width="150" height="32" rx="7" fill="#0e1628" stroke="rgba(34,211,238,.45)"/>
+        <text x="261" y="312" text-anchor="middle" fill="#22d3ee" font-size="10.5">② ima 适配器</text>
+        <rect x="348" y="292" width="150" height="32" rx="7" fill="#0e1628" stroke="rgba(167,139,250,.45)"/>
+        <text x="423" y="312" text-anchor="middle" fill="#a78bfa" font-size="10.5">③ 钉钉文档适配器</text>
+        <rect x="510" y="292" width="146" height="32" rx="7" fill="#0e1628" stroke="rgba(251,191,36,.45)"/>
+        <text x="583" y="312" text-anchor="middle" fill="#fbbf24" font-size="10.5">④ 腾讯文档适配器</text>
+        <line x1="340" y1="334" x2="340" y2="348" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 同步层 -->
+        <rect x="12" y="350" width="656" height="50" rx="9" fill="#0e1628" stroke="rgba(251,191,36,.5)"/>
+        <rect x="12" y="350" width="656" height="3" fill="url(#ukGa)"/>
+        <text x="26" y="372" fill="#fbbf24" font-size="11" font-weight="bold">同步层</text>
+        <text x="340" y="372" text-anchor="middle" fill="#fcd34d" font-size="11">事件推送（Webhook） + 定时增量拉取 + 周级全量对账</text>
+        <text x="340" y="390" text-anchor="middle" fill="#8fa3c4" font-size="9.5">幂等 content_hash │ 冲突消解（主源优先级 自建&gt;钉钉&gt;腾讯&gt;ima，禁止静默覆盖）│ 配额限流与错峰 │ 频率分级</text>
+        <line x1="340" y1="400" x2="340" y2="414" stroke="#5b6c8c" stroke-width="1.3" marker-end="url(#ukArr)"/>
+        <!-- 沉淀层 -->
+        <rect x="12" y="416" width="656" height="44" rx="9" fill="#0e1628" stroke="rgba(244,114,182,.5)"/>
+        <rect x="12" y="416" width="656" height="3" fill="url(#ukGp)"/>
+        <text x="26" y="436" fill="#f472b6" font-size="11" font-weight="bold">沉淀层</text>
+        <text x="340" y="436" text-anchor="middle" fill="#f9a8d4" font-size="11">定稿触发 → 结构化抽取 → 质量评分 → 准入判定 → 去重合并 → 回写目标库 → 索引更新 + 审计</text>
+        <text x="340" y="452" text-anchor="middle" fill="#5b6c8c" font-size="9">沉淀后的条目在下次撰写同类文档时自动进入 RAG 上下文：同类文档撰写耗时随沉淀量递减</text>
+      </svg>
+    </div>
+    <div class="card">
+      <h3>三种接入模式与联邦检索</h3>
+      <table>
+        <tr><th>接入模式</th><th>适用</th><th>做法</th><th>取舍</th></tr>
+        <tr><td><b style="color:var(--green)">A. 原生托管</b></td><td>自建库</td><td>直接写入统一索引，结构化字段完备</td><td>质量最高，需录入人力</td></tr>
+        <tr><td><b style="color:var(--cyan)">B. 镜像同步（推荐优先）</b></td><td>钉钉文档、腾讯文档</td><td>导出 markdown → 规范化 → 入自建索引，保留 origin_url 回链</td><td>检索质量高、可离线、支持统一重排；需处理增量与配额</td></tr>
+        <tr><td><b style="color:var(--amber)">C. 检索代理（兜底）</b></td><td>导出受限或成本过高</td><td>不搬运原文，实时转发检索请求，结果归一化为 CanonicalDoc 参与融合排序</td><td>零存储、始终最新；受源平台检索能力约束，不可离线</td></tr>
+      </table>
+      <p class="note" style="margin-top:12px">决策规则：<b style="color:var(--cyan)">能镜像则镜像，不能镜像才代理</b>。镜像模式保证检索质量可控（统一分块 / 向量 / 重排），是「单一答案」目标的前提；代理模式仅用于补充长尾来源。ima 采用<b>混合模式</b>——平台侧维护索引镜像用于融合排序，写入侧直接调用 add_knowledge 保证与用户在 ima 端操作一致。</p>
+      <p style="font-size:12.5px;margin-top:10px">联邦检索链路：<span class="pill cyan">意图与分域识别</span> <span style="color:var(--dim)">→</span> <span class="pill vio">源路由选源+权重</span> <span style="color:var(--dim)">→</span> <span class="pill amb">并行检索 N 源</span> <span style="color:var(--dim)">→</span> <span class="pill grn">分数归一化</span> <span style="color:var(--dim)">→</span> <span class="pill cyan">RRF / 重排融合</span> <span style="color:var(--dim)">→</span> <span class="pill vio">权限过滤 + 去重</span> <span style="color:var(--dim)">→</span> <span class="pill amb">Top-K + 引用溯源</span></p>
+      <p class="note">关键设计：各源分数分布不同（向量余弦 vs BM25 vs 平台自有分），必须先归一化再融合，否则高分源会系统性压过其它源；单源超时 / 限流时标记「该源未参与本次检索」并提示，<b>不阻塞整体返回</b>。</p>
+    </div>
+    <div class="card">
+      <h3>文档 / 文章撰写 → 知识沉淀闭环</h3>
+<!-- STAGED 2/4 -->
